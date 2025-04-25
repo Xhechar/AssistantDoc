@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Program {
+  ProgramId     String       @id @unique
+  ProgramName   String
+  Description   String?
+  DateCreated   DateTime     @default(now())
+  DateModified  DateTime     @updatedAt
+
+  CreatedByUserId String?
+  CreatedBy       User?        @relation("UserPrograms", fields: [CreatedByUserId], references: [UserId], onDelete: NoAction)
+
+  Enrollments     Enrollment[]
+}
+
+model User {
+  UserId      String     @id @unique
+  FullName    String
+  Email       String     @unique
+  Phone       String
+  Password    String
+  Role        String     @default("Doctor")
+  IsWelcomed  Boolean    @default(false)
+  DateCreated DateTime   @default(now())
+
+  ProgramsCreated Program[]   @relation("UserPrograms")
+  Enrollments     Enrollment[] @relation("UserEnrollments")
+}
+
+model Patient {
+  PatientId     String       @id @unique
+  FullName      String
+  Phone         String?
+  Email         String?
+  DateOfBirth   DateTime?
+  NationalId    String?      @unique
+  DateCreated   DateTime     @default(now())
+
+  Enrollments   Enrollment[]
+}
+
+model Enrollment {
+  EnrollmentId     String    @id @unique
+  PatientId        String
+  ProgramId        String
+  EnrolledByUserId String?
+
+  DateCreated      DateTime  @default(now())
+  Status           String    @default("Approved")
+
+  Patient          Patient   @relation(fields: [PatientId], references: [PatientId], onDelete: NoAction)
+  Program          Program   @relation(fields: [ProgramId], references: [ProgramId], onDelete: NoAction)
+  EnrolledBy       User?     @relation("UserEnrollments", fields: [EnrolledByUserId], references: [UserId], onDelete: NoAction)
+}
