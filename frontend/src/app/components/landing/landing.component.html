@@ -1,1 +1,348 @@
-<p>landing works!</p>
+<div class="overlay"></div>
+
+<header>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-heartbeat"></i>
+            <h1>AssistantDoc<span>+</span></h1>
+        </div>
+        <div class="nav-links">
+            <ul>
+                <li><a href="#" class="active">Home</a></li>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Testimonials</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+        <div class="auth-buttons">
+            <button routerLink="login" class="login-btn">Login</button>
+            <button routerLink="register" class="signup-btn">Sign Up</button>
+        </div>
+        <div class="hamburger">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="reveal-text">Streamline Your <span>Healthcare Practice</span></h1>
+            <p class="reveal-text delay-1">Efficiently manage clients, design personalized health programs, and grow
+                your practice with our comprehensive healthcare management platform.</p>
+            <div class="cta-buttons reveal-text delay-2">
+                <button class="primary-btn">Get Started <i class="fas fa-arrow-right"></i></button>
+                <button class="secondary-btn">Watch Demo <i class="fas fa-play"></i></button>
+            </div>
+        </div>
+        <div class="hero-image reveal-image">
+            <img src="/api/placeholder/600/450" alt="Doctor using digital platform">
+            <div class="floating-card card-1">
+                <i class="fas fa-user-md"></i>
+                <span>500+ Doctors</span>
+            </div>
+            <div class="floating-card card-2">
+                <i class="fas fa-heartbeat"></i>
+                <span>98% Success Rate</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="section-header">
+            <h2>Powerful Features for <span>Healthcare Professionals</span></h2>
+            <p>Everything you need to manage your practice and deliver excellent patient care</p>
+        </div>
+
+        <div class="feature-cards">
+            <div class="feature-card fade-in">
+                <div class="icon-container">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Client Management</h3>
+                <p>Easily organize patient information, medical history, and appointments in one secure location.</p>
+                <a href="#" class="learn-more">Learn More <i class="fas fa-chevron-right"></i></a>
+            </div>
+
+            <div class="feature-card fade-in delay-1">
+                <div class="icon-container">
+                    <i class="fas fa-notes-medical"></i>
+                </div>
+                <h3>Health Programs</h3>
+                <p>Create customized treatment plans and wellness programs tailored to each patient's needs.</p>
+                <a href="#" class="learn-more">Learn More <i class="fas fa-chevron-right"></i></a>
+            </div>
+
+            <div class="feature-card fade-in delay-2">
+                <div class="icon-container">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Appointment Scheduling</h3>
+                <p>Streamline booking with an intuitive calendar system that reduces no-shows and conflicts.</p>
+                <a href="#" class="learn-more">Learn More <i class="fas fa-chevron-right"></i></a>
+            </div>
+
+            <div class="feature-card fade-in delay-3">
+                <div class="icon-container">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Progress Tracking</h3>
+                <p>Monitor patient outcomes with comprehensive analytics and visual progress reports.</p>
+                <a href="#" class="learn-more">Learn More <i class="fas fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="section-header">
+            <h2>How <span>AssistantDoc+</span> Works</h2>
+            <p>Simple and intuitive process designed for healthcare professionals</p>
+        </div>
+
+        <div class="steps-container">
+            <div class="step slide-in-right">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Create Your Account</h3>
+                    <p>Sign up in minutes and set up your personalized practice profile</p>
+                </div>
+            </div>
+
+            <div class="step slide-in-right delay-1">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Add Client Profiles</h3>
+                    <p>Securely store client information and medical history</p>
+                </div>
+            </div>
+
+            <div class="step slide-in-right delay-2">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Design Health Programs</h3>
+                    <p>Create customized treatment plans for each client</p>
+                </div>
+            </div>
+
+            <div class="step slide-in-right delay-3">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Monitor Progress</h3>
+                    <p>Track outcomes and adjust treatments based on results</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="section-header">
+            <h2>Trusted by <span>Healthcare Professionals</span></h2>
+            <p>See what doctors are saying about our platform</p>
+        </div>
+
+        <div class="testimonial-slider">
+            <div class="testimonial-card active">
+                <div class="quote"><i class="fas fa-quote-left"></i></div>
+                <p>"AssistantDoc+ has completely transformed how I manage my practice. The client management features save
+                    me hours each week, and my patients love the personalized health programs."</p>
+                <div class="testimonial-author">
+                    <img src="/api/placeholder/60/60" alt="Dr. Sarah Johnson">
+                    <div>
+                        <h4>Dr. Sarah Johnson</h4>
+                        <span>Cardiologist</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="quote"><i class="fas fa-quote-left"></i></div>
+                <p>"As a busy physician, efficiency is crucial. This platform streamlines all administrative tasks so I
+                    can focus on what matters most - patient care. The intuitive interface means my staff needed minimal
+                    training."</p>
+                <div class="testimonial-author">
+                    <img src="/api/placeholder/60/60" alt="Dr. Michael Chen">
+                    <div>
+                        <h4>Dr. Michael Chen</h4>
+                        <span>Family Physician</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="quote"><i class="fas fa-quote-left"></i></div>
+                <p>"The ability to create customized health programs for each patient has significantly improved
+                    treatment adherence. My practice has seen measurable improvements in patient outcomes since
+                    implementing AssistantDoc+."</p>
+                <div class="testimonial-author">
+                    <img src="/api/placeholder/60/60" alt="Dr. Lisa Patel">
+                    <div>
+                        <h4>Dr. Lisa Patel</h4>
+                        <span>Nutritionist</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slider-controls">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="cta-content">
+            <h2>Ready to transform <span>your practice?</span></h2>
+            <p>Join thousands of healthcare professionals who trust AssistantDoc+ to manage their practice efficiently.</p>
+            <button class="primary-btn large">Get Started Today <i class="fas fa-arrow-right"></i></button>
+        </div>
+        <div class="cta-image">
+            <img src="/api/placeholder/500/400" alt="Healthcare professionals using AssistantDoc+">
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-logo">
+            <i class="fas fa-heartbeat"></i>
+            <h2>AssistantDoc<span>+</span></h2>
+            <p>Empowering healthcare professionals with innovative tools to deliver exceptional patient care.</p>
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-links">
+            <div class="link-column">
+                <h3>Product</h3>
+                <ul>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Integrations</a></li>
+                    <li><a href="#">Updates</a></li>
+                </ul>
+            </div>
+
+            <div class="link-column">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+
+            <div class="link-column">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2025 AssistantDoc+. All rights reserved.</p>
+        <div class="footer-bottom-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Cookie Policy</a>
+        </div>
+    </div>
+</footer>
+
+<!-- Login Modal -->
+<div class="modal login-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Login to Your Account</h2>
+            <span class="close-modal"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <div class="form-footer">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+                <button type="submit" class="primary-btn full-width">Login</button>
+            </form>
+            <div class="divider">
+                <span>OR</span>
+            </div>
+            <div class="social-login">
+                <button class="google-btn"><i class="fab fa-google"></i> Login with Google</button>
+                <button class="facebook-btn"><i class="fab fa-facebook-f"></i> Login with Facebook</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Signup Modal -->
+<div class="modal signup-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Create an Account</h2>
+            <span class="close-modal"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm">Confirm Password</label>
+                    <input type="password" id="signup-confirm" placeholder="Confirm your password">
+                </div>
+                <div class="form-footer">
+                    <div class="terms">
+                        <input type="checkbox" id="terms">
+                        <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy
+                                Policy</a></label>
+                    </div>
+                </div>
+                <button type="submit" class="primary-btn full-width">Sign Up</button>
+            </form>
+            <div class="divider">
+                <span>OR</span>
+            </div>
+            <div class="social-login">
+                <button class="google-btn"><i class="fab fa-google"></i> Sign up with Google</button>
+                <button class="facebook-btn"><i class="fab fa-facebook-f"></i> Sign up with Facebook</button>
+            </div>
+        </div>
+    </div>
+</div>

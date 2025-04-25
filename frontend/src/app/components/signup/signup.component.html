@@ -1,0 +1,123 @@
+<div class="signup-container">
+    <div class="signup-card">
+        <div class="card-header">
+            <a href="/" class="home-link">
+                <i class="fa fa-home"></i>
+            </a>
+            <h2>Create Your Account</h2>
+            <p>Join our healthcare management platform</p>
+        </div>
+
+        <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" novalidate>
+            <div class="form-group">
+                <label for="FullName">Full Name</label>
+                <div class="input-wrapper">
+                    <i class="bx bx-user"></i>
+                    <input type="text" id="FullName" name="FullName" [(ngModel)]="user.FullName" #FullName="ngModel"
+                        required minlength="3" placeholder="Enter your full name">
+                </div>
+                <div class="error-message" *ngIf="FullName.invalid && (FullName.dirty || FullName.touched)">
+                    <span *ngIf="FullName.errors?.['required']">Full name is required</span>
+                    <span *ngIf="FullName.errors?.['minlength']">Full name must be at least 3 characters</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Email Address</label>
+                <div class="input-wrapper">
+                    <i class="bx bx-envelope"></i>
+                    <input type="email" id="Email" name="Email" [(ngModel)]="user.Email" #Email="ngModel" required email
+                        placeholder="Enter your email address">
+                </div>
+                <div class="error-message" *ngIf="Email.invalid && (Email.dirty || Email.touched)">
+                    <span *ngIf="Email.errors?.['required']">Email is required</span>
+                    <span *ngIf="Email.errors?.['email']">Please enter a valid email address</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Phone">Phone Number</label>
+                <div class="input-wrapper">
+                    <i class="bx bx-phone"></i>
+                    <input type="tel" id="Phone" name="Phone" [(ngModel)]="user.Phone" #Phone="ngModel" required
+                        pattern="^\+?[0-9\s\-\(\)]{10,15}$" placeholder="Enter your phone number">
+                </div>
+                <div class="error-message" *ngIf="Phone.invalid && (Phone.dirty || Phone.touched)">
+                    <span *ngIf="Phone.errors?.['required']">Phone number is required</span>
+                    <span *ngIf="Phone.errors?.['pattern']">Please enter a valid phone number</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Password">Password</label>
+                <div class="input-wrapper">
+                    <i class="bx bx-lock-alt"></i>
+                    <input [type]="showPassword ? 'text' : 'password'" id="Password" name="Password"
+                        [(ngModel)]="user.Password" #Password="ngModel" required minlength="8"
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                        placeholder="Create a strong password">
+                    <i class="toggle-password" [class]="showPassword ? 'bx bx-show' : 'bx bx-hide'"
+                        (click)="togglePasswordVisibility('password')"></i>
+                </div>
+                <div class="error-message" *ngIf="Password.invalid && (Password.dirty || Password.touched)">
+                    <span *ngIf="Password.errors?.['required']">Password is required</span>
+                    <span *ngIf="Password.errors?.['minlength']">Password must be at least 8 characters</span>
+                    <span *ngIf="Password.errors?.['pattern']">Password must contain uppercase, lowercase, number and
+                        special character</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="input-wrapper">
+                    <i class="bx bx-lock-alt"></i>
+                    <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword"
+                        name="confirmPassword" [(ngModel)]="confirmPassword" #confPassword="ngModel" required
+                        placeholder="Confirm your password">
+                    <i class="toggle-password" [class]="showConfirmPassword ? 'bx bx-show' : 'bx bx-hide'"
+                        (click)="togglePasswordVisibility('confirm')"></i>
+                </div>
+                <div class="error-message" *ngIf="confPassword.dirty && user.Password !== confirmPassword">
+                    <span>Passwords do not match</span>
+                </div>
+            </div>
+
+            <div class="form-group terms">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="terms" [(ngModel)]="acceptTerms" required #terms="ngModel">
+                    <span class="checkmark"></span>
+                    I agree to the <a href="/terms" class="terms-link">Terms of Service</a> and <a href="/privacy"
+                        class="terms-link">Privacy Policy</a>
+                </label>
+                <div class="error-message" *ngIf="terms.invalid && (terms.dirty || terms.touched)">
+                    <span>You must accept the terms to continue</span>
+                </div>
+            </div>
+
+            <button type="submit" class="signup-btn"
+                [disabled]="registerForm.invalid || user.Password !== confirmPassword || !acceptTerms"
+                [class.disabled]="registerForm.invalid || user.Password !== confirmPassword || !acceptTerms">
+                <i class="bx bx-user-plus"></i> Create Account
+            </button>
+
+            <div class="alternative-signin">
+                <span class="divider">or sign up with</span>
+                <div class="social-buttons">
+                    <button type="button" class="social-btn google">
+                        <i class="fa fa-google"></i>
+                    </button>
+                    <button type="button" class="social-btn facebook">
+                        <i class="fa fa-facebook-f"></i>
+                    </button>
+                    <button type="button" class="social-btn apple">
+                        <i class="fa fa-apple"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="/login">Sign in</a>
+        </div>
+    </div>
+</div>
