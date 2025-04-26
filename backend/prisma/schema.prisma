@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
 }
 
@@ -21,7 +21,7 @@ model Program {
   DateModified  DateTime     @updatedAt
 
   CreatedByUserId String?
-  CreatedBy       User?        @relation("UserPrograms", fields: [CreatedByUserId], references: [UserId], onDelete: NoAction)
+  CreatedBy       User?        @relation("UserPrograms", fields: [CreatedByUserId], references: [UserId], onDelete: NoAction, onUpdate: NoAction)
 
   Enrollments     Enrollment[]
 }
@@ -30,7 +30,7 @@ model User {
   UserId      String     @id @unique
   FullName    String
   Email       String     @unique
-  Phone       String
+  Phone       String     @unique
   Password    String
   Role        String     @default("Doctor")
   IsWelcomed  Boolean    @default(false)
@@ -38,13 +38,17 @@ model User {
 
   ProgramsCreated Program[]   @relation("UserPrograms")
   Enrollments     Enrollment[] @relation("UserEnrollments")
+
+  Patient Patient[] @relation("UserPatients")
 }
 
 model Patient {
   PatientId     String       @id @unique
   FullName      String
-  Phone         String?
-  Email         String?
+  Phone         String?   @unique
+  Email         String?     @unique
+  CreatedByUserId String?
+  CreatedBy     User?        @relation("UserPatients", fields: [CreatedByUserId], references: [UserId], onDelete: NoAction, onUpdate: NoAction)
   DateOfBirth   DateTime?
   NationalId    String?      @unique
   DateCreated   DateTime     @default(now())
@@ -59,9 +63,9 @@ model Enrollment {
   EnrolledByUserId String?
 
   DateCreated      DateTime  @default(now())
-  Status           String    @default("Approved")
+  Status           String    @default("Pending")
 
-  Patient          Patient   @relation(fields: [PatientId], references: [PatientId], onDelete: NoAction)
-  Program          Program   @relation(fields: [ProgramId], references: [ProgramId], onDelete: NoAction)
-  EnrolledBy       User?     @relation("UserEnrollments", fields: [EnrolledByUserId], references: [UserId], onDelete: NoAction)
+  Patient          Patient   @relation(fields: [PatientId], references: [PatientId], onDelete: NoAction, onUpdate: NoAction)
+  Program          Program   @relation(fields: [ProgramId], references: [ProgramId], onDelete: NoAction, onUpdate: NoAction)
+  EnrolledBy       User?     @relation("UserEnrollments", fields: [EnrolledByUserId], references: [UserId], onUpdate: NoAction, onDelete: NoAction)
 }

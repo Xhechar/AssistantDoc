@@ -1,123 +1,138 @@
 <div class="signup-container">
-    <div class="signup-card">
-        <div class="card-header">
-            <a href="/" class="home-link">
-                <i class="fa fa-home"></i>
-            </a>
-            <h2>Create Your Account</h2>
-            <p>Join our healthcare management platform</p>
+    <div class="signup-content">
+        <div class="signup-info">
+            <div class="logo">
+                <i class="bx bx-plus-medical"></i>
+                <h2>Assistant<span>Doc</span></h2>
+            </div>
+            <h1>Join Our Healthcare Platform</h1>
+            <p>Streamline your practice, manage clients, and deliver better healthcare programs with our intuitive
+                platform designed specifically for medical professionals.</p>
+            <div class="features">
+                <div class="feature">
+                    <i class="bx bx-user"></i>
+                    <span>Client Management</span>
+                </div>
+                <div class="feature">
+                    <i class="bx bx-calendar"></i>
+                    <span>Appointment Scheduling</span>
+                </div>
+                <div class="feature">
+                    <i class="bx bx-notepad"></i>
+                    <span>Health Programs</span>
+                </div>
+            </div>
         </div>
 
-        <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" novalidate>
-            <div class="form-group">
-                <label for="FullName">Full Name</label>
-                <div class="input-wrapper">
-                    <i class="bx bx-user"></i>
-                    <input type="text" id="FullName" name="FullName" [(ngModel)]="user.FullName" #FullName="ngModel"
-                        required minlength="3" placeholder="Enter your full name">
-                </div>
-                <div class="error-message" *ngIf="FullName.invalid && (FullName.dirty || FullName.touched)">
-                    <span *ngIf="FullName.errors?.['required']">Full name is required</span>
-                    <span *ngIf="FullName.errors?.['minlength']">Full name must be at least 3 characters</span>
-                </div>
+        <div class="signup-form">
+            <div class="form-header">
+                <a href="/" class="home-link">
+                    <i class="bx bx-home"></i>
+                </a>
+                <h3>Create Account</h3>
             </div>
 
-            <div class="form-group">
-                <label for="Email">Email Address</label>
-                <div class="input-wrapper">
-                    <i class="bx bx-envelope"></i>
-                    <input type="email" id="Email" name="Email" [(ngModel)]="user.Email" #Email="ngModel" required email
-                        placeholder="Enter your email address">
+            <form #signUp="ngForm" (ngSubmit)="onSubmit(signUp.value)" novalidate>
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <div class="input-container">
+                        <i class="bx bx-user"></i>
+                        <input type="text" id="fullName" name="FullName" [(ngModel)]="registerModel.FullName"
+                            #fullName="ngModel" required minlength="3" placeholder="Enter your full name">
+                    </div>
+                    <div class="error-message" *ngIf="fullName.invalid && (fullName.dirty || fullName.touched)">
+                        <small *ngIf="fullName.errors?.['required']">Full name is required</small>
+                        <small *ngIf="fullName.errors?.['minlength']">Full name must be at least 3 characters</small>
+                    </div>
                 </div>
-                <div class="error-message" *ngIf="Email.invalid && (Email.dirty || Email.touched)">
-                    <span *ngIf="Email.errors?.['required']">Email is required</span>
-                    <span *ngIf="Email.errors?.['email']">Please enter a valid email address</span>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label for="Phone">Phone Number</label>
-                <div class="input-wrapper">
-                    <i class="bx bx-phone"></i>
-                    <input type="tel" id="Phone" name="Phone" [(ngModel)]="user.Phone" #Phone="ngModel" required
-                        pattern="^\+?[0-9\s\-\(\)]{10,15}$" placeholder="Enter your phone number">
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-container">
+                        <i class="bx bx-envelope"></i>
+                        <input type="email" id="email" name="Email" [(ngModel)]="registerModel.Email" #email="ngModel"
+                            required email placeholder="Enter your email address">
+                    </div>
+                    <div class="error-message" *ngIf="email.invalid && (email.dirty || email.touched)">
+                        <small *ngIf="email.errors?.['required']">Email is required</small>
+                        <small *ngIf="email.errors?.['email']">Please enter a valid email address</small>
+                    </div>
                 </div>
-                <div class="error-message" *ngIf="Phone.invalid && (Phone.dirty || Phone.touched)">
-                    <span *ngIf="Phone.errors?.['required']">Phone number is required</span>
-                    <span *ngIf="Phone.errors?.['pattern']">Please enter a valid phone number</span>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label for="Password">Password</label>
-                <div class="input-wrapper">
-                    <i class="bx bx-lock-alt"></i>
-                    <input [type]="showPassword ? 'text' : 'password'" id="Password" name="Password"
-                        [(ngModel)]="user.Password" #Password="ngModel" required minlength="8"
-                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                        placeholder="Create a strong password">
-                    <i class="toggle-password" [class]="showPassword ? 'bx bx-show' : 'bx bx-hide'"
-                        (click)="togglePasswordVisibility('password')"></i>
+                <!-- Phone -->
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="input-container">
+                        <i class="bx bx-phone"></i>
+                        <input type="tel" id="phone" name="Phone" [(ngModel)]="registerModel.Phone" #phone="ngModel"
+                            required pattern="^[0-9]{10,15}$" placeholder="Enter your phone number">
+                    </div>
+                    <div class="error-message" *ngIf="phone.invalid && (phone.dirty || phone.touched)">
+                        <small *ngIf="phone.errors?.['required']">Phone number is required</small>
+                        <small *ngIf="phone.errors?.['pattern']">Please enter a valid phone number (10-15
+                            digits)</small>
+                    </div>
                 </div>
-                <div class="error-message" *ngIf="Password.invalid && (Password.dirty || Password.touched)">
-                    <span *ngIf="Password.errors?.['required']">Password is required</span>
-                    <span *ngIf="Password.errors?.['minlength']">Password must be at least 8 characters</span>
-                    <span *ngIf="Password.errors?.['pattern']">Password must contain uppercase, lowercase, number and
-                        special character</span>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <div class="input-wrapper">
-                    <i class="bx bx-lock-alt"></i>
-                    <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword"
-                        name="confirmPassword" [(ngModel)]="confirmPassword" #confPassword="ngModel" required
-                        placeholder="Confirm your password">
-                    <i class="toggle-password" [class]="showConfirmPassword ? 'bx bx-show' : 'bx bx-hide'"
-                        (click)="togglePasswordVisibility('confirm')"></i>
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-container">
+                        <i class="bx bx-lock"></i>
+                        <input [type]="showPassword ? 'text' : 'password'" id="password" name="Password"
+                            [(ngModel)]="registerModel.Password" #password="ngModel" required minlength="8"
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                            placeholder="Create a password">
+                        <i class="toggle-password" [class.bx-show]="!showPassword" [class.bx-hide]="showPassword"
+                            (click)="togglePasswordVisibility('password')"></i>
+                    </div>
+                    <div class="error-message" *ngIf="password.invalid && (password.dirty || password.touched)">
+                        <small *ngIf="password.errors?.['required']">Password is required</small>
+                        <small *ngIf="password.errors?.['minlength']">Password must be at least 8 characters</small>
+                        <small *ngIf="password.errors?.['pattern']">Password must contain uppercase, lowercase, number
+                            and special character</small>
+                    </div>
                 </div>
-                <div class="error-message" *ngIf="confPassword.dirty && user.Password !== confirmPassword">
-                    <span>Passwords do not match</span>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-container">
+                        <i class="bx bx-lock-alt"></i>
+                        <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword"
+                            name="confirmPassword" [(ngModel)]="confirmPassword" #confPassword="ngModel" required
+                            placeholder="Confirm your password" [pattern]="registerModel.Password">
+                        <i class="toggle-password" [class.bx-show]="!showConfirmPassword"
+                            [class.bx-hide]="showConfirmPassword" (click)="togglePasswordVisibility('confirm')"></i>
+                    </div>
+                    <div class="error-message"
+                        *ngIf="confPassword.invalid && (confPassword.dirty || confPassword.touched)">
+                        <small *ngIf="confPassword.errors?.['required']">Please confirm your password</small>
+                        <small *ngIf="confPassword.errors?.['pattern']">Passwords do not match</small>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group terms">
-                <label class="checkbox-container">
-                    <input type="checkbox" name="terms" [(ngModel)]="acceptTerms" required #terms="ngModel">
-                    <span class="checkmark"></span>
-                    I agree to the <a href="/terms" class="terms-link">Terms of Service</a> and <a href="/privacy"
-                        class="terms-link">Privacy Policy</a>
-                </label>
-                <div class="error-message" *ngIf="terms.invalid && (terms.dirty || terms.touched)">
-                    <span>You must accept the terms to continue</span>
+                <!-- Terms and Conditions -->
+                <div class="form-check">
+                    <input type="checkbox" id="terms" name="terms" [(ngModel)]="terms" #termsCheck="ngModel" required>
+                    <label for="terms">I agree to the <a href="#">Terms and Conditions</a></label>
+                    <div class="error-message" *ngIf="termsCheck.invalid && (termsCheck.dirty || termsCheck.touched)">
+                        <small *ngIf="termsCheck.errors?.['required']">You must agree to the terms and
+                            conditions</small>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" class="signup-btn"
-                [disabled]="registerForm.invalid || user.Password !== confirmPassword || !acceptTerms"
-                [class.disabled]="registerForm.invalid || user.Password !== confirmPassword || !acceptTerms">
-                <i class="bx bx-user-plus"></i> Create Account
-            </button>
+                <!-- Submit Button -->
+                <button type="submit" [disabled]="signUp.invalid || !terms" [class.disabled]="signUp.invalid || !terms"
+                    class="signup-btn">
+                    <i class="bx bx-user-plus"></i>
+                    Create Account
+                </button>
 
-            <div class="alternative-signin">
-                <span class="divider">or sign up with</span>
-                <div class="social-buttons">
-                    <button type="button" class="social-btn google">
-                        <i class="fa fa-google"></i>
-                    </button>
-                    <button type="button" class="social-btn facebook">
-                        <i class="fa fa-facebook-f"></i>
-                    </button>
-                    <button type="button" class="social-btn apple">
-                        <i class="fa fa-apple"></i>
-                    </button>
-                </div>
-            </div>
-        </form>
-
-        <div class="login-link">
-            Already have an account? <a href="/login">Sign in</a>
+                <p class="login-link">Already have an account? <a routerLink="/login">Log in</a></p>
+            </form>
         </div>
     </div>
 </div>

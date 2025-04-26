@@ -1,1 +1,121 @@
-<p>doctor works!</p>
+<!-- Navbar Component -->
+<nav class="navbar">
+    <div class="navbar-container">
+        <!-- Logo Section -->
+        <div class="navbar-logo">
+            <a routerLink="/">
+                <span class="logo-text">A.<span class="highlight">Doc</span></span>
+            </a>
+        </div>
+
+        <!-- Mobile Menu Toggle Button -->
+        <div class="mobile-toggle" (click)="toggleMobileMenu()">
+            <i class="bx bx-menu" *ngIf="!mobileMenuOpen"></i>
+            <i class="bx bx-x" *ngIf="mobileMenuOpen"></i>
+        </div>
+
+        <!-- Navigation Menu -->
+        <div class="navbar-menu" [ngClass]="{'active': mobileMenuOpen}">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link">
+                        <i class="bx bx-user-plus"></i> Clients
+                        <i class="bx bx-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a routerLink="/doctor/patients" class="dropdown-item">
+                            <i class="bx bx-user-plus"></i> Register Client
+                        </a>
+                        <a routerLink="/clients/patients" class="dropdown-item">
+                            <i class="bx bx-search"></i> Search Clients
+                        </a>
+                        <a routerLink="/doctor/dashboard" class="dropdown-item">
+                            <i class="bx bx-list-ul"></i> Dashboard
+                        </a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link">
+                        <i class="bx bx-plus-medical"></i> Programs
+                        <i class="bx bx-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a routerLink="/doctor/programs" class="dropdown-item">
+                            <i class="bx bx-plus-circle"></i> Create Program
+                        </a>
+                        <a routerLink="/doctor/programs" class="dropdown-item">
+                            <i class="bx bx-list-ul"></i> Manage Programs
+                        </a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link">
+                        <i class="bx bx-link"></i> Enrollments
+                        <i class="bx bx-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a routerLink="/doctor/enrollments" class="dropdown-item">
+                            <i class="bx bx-user-check"></i> Enroll Client
+                        </a>
+                        <a routerLink="/doctor/enrollments" class="dropdown-item">
+                            <i class="bx bx-edit"></i> Manage Enrollments
+                        </a>
+                    </div>
+                </li>
+
+                <li class="nav-item">
+                    <a routerLink="/doctor/patients" class="nav-link">
+                        <i class="bx bx-code-alt"></i> API
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a routerLink="/doctor/dashboard" class="nav-link">
+                        <i class="bx bx-home-alt"></i> Dashboard
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- User Profile Section -->
+        <div class="navbar-user">
+            <div class="notifications">
+                <i class="bx bx-bell"></i>
+                <span class="badge">3</span>
+            </div>
+
+            <div class="user-profile dropdown">
+                <div class="user-info" (click)="toggleUserMenu()">
+                    <img src="assets/images/doctor-avatar.png" alt="User Profile" class="user-avatar">
+                    <div class="user-details">
+                        <span class="user-name">Dr. Smith</span>
+                        <span class="user-role">Physician</span>
+                    </div>
+                    <i class="bx bx-chevron-down"></i>
+                </div>
+
+                <div class="dropdown-menu user-dropdown" [ngClass]="{'show': userMenuOpen}">
+                    <a routerLink="/profile" class="dropdown-item">
+                        <i class="bx bx-user-circle"></i> My Profile
+                    </a>
+                    <a routerLink="/doctor/dashboard" class="dropdown-item">
+                        <i class="bx bx-cog"></i> Settings
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item logout">
+                        <i class="bx bx-log-out"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Overlay for Mobile Menu -->
+<div class="overlay" [ngClass]="{'active': mobileMenuOpen}" (click)="closeMobileMenu()"></div>
+
+<div class="entire-contents">
+    <router-outlet></router-outlet>
+</div>

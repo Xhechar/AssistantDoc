@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export interface Program {
   ProgramId: string;
   ProgramName: string;
@@ -15,7 +17,7 @@ export interface User {
   Email: string;
   Phone: string;
   Password: string;
-  Role?: string;
+  Role: string;
   IsWelcomed: boolean;
   DateCreated: Date;
   ProgramsCreated?: Program[];
@@ -54,4 +56,18 @@ export interface ServiceResponse<T> {
   objects?: T[] | null;
   token?: string | null;
   role?: string | null;
+}
+
+export interface TokenDetails {
+  UserId: string;
+  Role: string;
+}
+
+export interface ExtendedRequest extends Request {
+  info?: TokenDetails;
+}
+
+export interface LoginDetails {
+  Email: string;
+  Password: string;
 }

@@ -1,1 +1,206 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+    <!-- Page Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1>Dashboard</h1>
+            <p>Welcome back, Dr. Smith! Here's an overview of your healthcare programs.</p>
+        </div>
+        <div class="header-actions">
+            <div class="date-filter">
+                <i class="bx bx-calendar"></i>
+                <span>{{ currentDateRange }}</span>
+                <i class="bx bx-chevron-down"></i>
+            </div>
+            <button class="btn-primary">
+                <i class="bx bx-plus"></i> New Program
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card" [ngClass]="{'pulse': newPatientsToday}">
+            <div class="stat-icon patients">
+                <i class="bx bx-user"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ totalPatients }}</h3>
+                <p>Total Patients</p>
+                <div class="stat-trend up">
+                    <i class="bx bx-up-arrow-alt"></i>
+                    <span>{{ patientGrowth }}%</span> this month
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon programs">
+                <i class="bx bx-plus-medical"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ totalPrograms }}</h3>
+                <p>Active Programs</p>
+                <div class="stat-trend up">
+                    <i class="bx bx-up-arrow-alt"></i>
+                    <span>{{ programGrowth }}%</span> this month
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon enrollments">
+                <i class="bx bx-link"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ totalEnrollments }}</h3>
+                <p>Total Enrollments</p>
+                <div class="stat-trend down">
+                    <i class="bx bx-down-arrow-alt"></i>
+                    <span>{{ enrollmentChange }}%</span> this month
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon users">
+                <i class="bx bx-group"></i>
+            </div>
+            <div class="stat-content">
+                <h3>{{ totalUsers }}</h3>
+                <p>System Users</p>
+                <div class="stat-trend up">
+                    <i class="bx bx-up-arrow-alt"></i>
+                    <span>{{ userGrowth }}%</span> this month
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="dashboard-grid">
+        <!-- Recent Patients -->
+        <div class="dashboard-card patients-list">
+            <div class="card-header">
+                <h2>Recent Patients</h2>
+                <div class="card-actions">
+                    <div class="search-bar">
+                        <i class="bx bx-search"></i>
+                        <input type="text" placeholder="Search patients..." (input)="searchPatients($event)">
+                    </div>
+                    <a routerLink="/clients/list" class="view-all">View All</a>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>ID</th>
+                                <th>Date Added</th>
+                                <th>Programs</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let patient of recentPatients" (click)="viewPatientDetails(patient.PatientId)"
+                                class="hover-effect">
+                                <td>
+                                    <div class="table-user">
+                                        <div class="user-avatar">{{ patient.FullName.substring(0, 2) }}</div>
+                                        <div class="user-details">
+                                            <span class="user-name">{{ patient.FullName }}</span>
+                                            <span class="user-info">{{ getPatientAge(patient.DateOfBirth) }}
+                                                years</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="id-badge">{{ patient.PatientId.substring(0, 8) }}</span></td>
+                                <td>{{ patient.DateCreated | date: 'MMM d, y' }}</td>
+                                <td>
+                                    <div class="enrollment-count">
+                                        <span class="badge">{{ patient.Enrollments?.length || 0 }}</span>
+                                        <span>{{ getEnrollmentText(patient.Enrollments?.length) }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn-icon"
+                                            (click)="viewPatientDetails(patient.PatientId); $event.stopPropagation();">
+                                            <i class="bx bx-show"></i>
+                                        </button>
+                                        <button class="btn-icon"
+                                            (click)="enrollPatient(patient.PatientId); $event.stopPropagation();">
+                                            <i class="bx bx-plus-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Programs Overview -->
+        <div class="dashboard-card programs-overview">
+            <div class="card-header">
+                <h2>Programs Overview</h2>
+                <a routerLink="/programs/list" class="view-all">View All</a>
+            </div>
+            <div class="card-content">
+                <div class="programs-grid">
+                    <div *ngFor="let program of activePrograms" class="program-card">
+                        <div class="program-header">
+                            <h3>{{ program.ProgramName }}</h3>
+                            <span class="enrollment-badge">{{ program.Enrollments?.length || 0 }}</span>
+                        </div>
+                        <p class="program-description">{{ program.Description || 'No description available' }}</p>
+                        <div class="program-footer">
+                            <span class="date-label">Created: {{ program.DateCreated | date: 'MMM d, y' }}</span>
+                            <button class="btn-text" (click)="viewProgramDetails(program.ProgramId)">
+                                View Details <i class="bx bx-right-arrow-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Enrollments -->
+        <div class="dashboard-card recent-enrollments">
+            <div class="card-header">
+                <h2>Recent Enrollments</h2>
+                <a routerLink="/enrollments/manage" class="view-all">View All</a>
+            </div>
+            <div class="card-content">
+                <div class="enrollments-list">
+                    <div *ngFor="let enrollment of recentEnrollments" class="enrollment-item">
+                        <div class="enrollment-header">
+                            <div class="patient-info">
+                                <div class="user-avatar">{{ enrollment.Patient ? enrollment.Patient.FullName.substring(0, 2) : ''}}</div>
+                                <div class="enrollment-details">
+                                    <span class="patient-name">{{ enrollment.Patient?.FullName }}</span>
+                                    <span class="program-name">{{ enrollment.Program?.ProgramName }}</span>
+                                </div>
+                            </div>
+                            <span class="status-badge" [ngClass]="enrollment.Status.toLowerCase()">
+                                {{ enrollment.Status }}
+                            </span>
+                        </div>
+                        <div class="enrollment-footer">
+                            <div class="enrollment-date">
+                                <i class="bx bx-calendar"></i>
+                                <span>{{ enrollment.DateCreated | date: 'MMM d, y' }}</span>
+                            </div>
+                            <div class="enrolled-by">
+                                <i class="bx bx-user"></i>
+                                <span>{{ enrollment.EnrolledBy?.FullName || 'System' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

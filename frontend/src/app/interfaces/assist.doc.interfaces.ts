@@ -15,7 +15,7 @@ export interface User {
   Email: string;
   Phone: string;
   Password: string;
-  Role?: string;
+  Role: string;
   IsWelcomed: boolean;
   DateCreated: Date;
   ProgramsCreated?: Program[];
@@ -54,4 +54,9 @@ export interface ServiceResponse<T> {
   objects?: T[] | null;
   token?: string | null;
   role?: string | null;
+}
+
+export interface LoginDetails {
+  Email: string;
+  Password: string;
 }

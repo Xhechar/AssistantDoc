@@ -1,1 +1,203 @@
-<p>programs works!</p>
+<div class="programs-container">
+    <div class="header-section">
+        <div class="title-section">
+            <h1>Programs Management</h1>
+            <p>Manage all your patient programs</p>
+        </div>
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class='bx bx-list-ul'></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{programs.length}}</h3>
+                    <p>Total Programs</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class='bx bx-user-plus'></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{getTotalEnrollments()}}</h3>
+                    <p>Total Enrollments</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class='bx bx-calendar'></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{getRecentProgramsCount()}}</h3>
+                    <p>Recent Programs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions-bar">
+        <div class="search-box">
+            <i class='bx bx-search'></i>
+            <input type="text" placeholder="Search programs..." [(ngModel)]="searchTerm" (input)="filterPrograms()">
+        </div>
+        <button class="btn-add" (click)="openProgramForm()">
+            <i class='bx bx-plus'></i> Add Program
+        </button>
+    </div>
+
+    <div class="programs-list">
+        <div class="programs-header">
+            <div class="program-col program-name">Program Name</div>
+            <div class="program-col program-desc">Description</div>
+            <div class="program-col program-date">Date Created</div>
+            <div class="program-col program-enrollments">Enrollments</div>
+            <div class="program-col program-actions">Actions</div>
+        </div>
+
+        <div *ngIf="filteredPrograms.length === 0" class="no-programs">
+            <i class='bx bx-folder-open'></i>
+            <p>No programs found. Create a new program to get started.</p>
+        </div>
+
+        <div *ngFor="let program of filteredPrograms" class="program-item">
+            <div class="program-col program-name">
+                <span class="program-title">{{program.ProgramName}}</span>
+            </div>
+            <div class="program-col program-desc">{{program.Description || 'No description'}}</div>
+            <div class="program-col program-date">{{program.DateCreated | date:'MMM d, y'}}</div>
+            <div class="program-col program-enrollments">
+                <span class="enrollment-count">{{program.Enrollments?.length || 0}}</span>
+            </div>
+            <div class="program-col program-actions">
+                <button class="btn-icon btn-update" (click)="openProgramUpdateForm(program)" title="Update Program">
+                    <i class='bx bx-edit'></i>
+                </button>
+                <button class="btn-icon btn-delete" (click)="openDeleteModal(program)" title="Delete Program">
+                    <i class='bx bx-trash'></i>
+                </button>
+                <button class="btn-icon btn-enroll" (click)="openEnrollModal(program)" title="Enroll Patients">
+                    <i class='bx bx-user-plus'></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Program Form Modal -->
+<div class="overlay" [ngClass]="{'active': showProgramForm}" (click)="closeAllModals($event)">
+    <div class="modal program-form-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{isEditMode ? 'Update Program' : 'Add New Program'}}</h2>
+            <button class="btn-close" (click)="closeProgramForm()">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form #programForm="ngForm" (ngSubmit)="saveProgram()">
+                <div class="form-group">
+                    <label for="ProgramName">Program Name*</label>
+                    <input type="text" id="ProgramName" name="ProgramName" [(ngModel)]="currentProgram.ProgramName"
+                        required #programName="ngModel">
+                    <div class="error-message"
+                        *ngIf="programName.invalid && (programName.dirty || programName.touched)">
+                        Program name is required
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="Description">Description</label>
+                    <textarea id="Description" name="Description" [(ngModel)]="currentProgram.Description" rows="4">
+          </textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" (click)="closeProgramForm()">Cancel</button>
+                    <button type="submit" class="btn-save" [disabled]="programForm.invalid">
+                        {{isEditMode ? 'Update' : 'Save'}}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="overlay" [ngClass]="{'active': showDeleteModal}" (click)="closeAllModals($event)">
+    <div class="modal delete-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Confirm Delete</h2>
+            <button class="btn-close" (click)="closeDeleteModal()">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-message">
+                <i class='bx bx-error-circle'></i>
+                <p>Are you sure you want to delete the program "<strong>{{programToDelete?.ProgramName}}</strong>"?</p>
+                <p class="warning-text">This action cannot be undone and will also remove all enrollments.</p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="closeDeleteModal()">Cancel</button>
+                <button type="button" class="btn-delete-confirm" (click)="deleteProgram()">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enroll Patients Modal -->
+<div class="overlay" [ngClass]="{'active': showEnrollModal}" (click)="closeAllModals($event)">
+    <div class="modal enroll-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Enroll Patients to {{programToEnroll?.ProgramName}}</h2>
+            <button class="btn-close" (click)="closeEnrollModal()">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="search-patients">
+                <div class="search-box">
+                    <i class='bx bx-search'></i>
+                    <input type="text" placeholder="Search patients..." [(ngModel)]="patientSearchTerm"
+                        (input)="searchPatients()">
+                </div>
+            </div>
+
+            <div class="patients-list">
+                <div *ngIf="patientSearchTerm && filteredPatients.length === 0" class="no-patients">
+                    <p>No patients found. Try a different search term.</p>
+                </div>
+                <div *ngIf="!patientSearchTerm" class="no-patients">
+                    <p>Type to search for patients.</p>
+                </div>
+                <div *ngFor="let patient of filteredPatients" class="patient-item" (click)="selectPatient(patient)">
+                    <div class="patient-info">
+                        <span class="patient-name">{{patient.FullName}}</span>
+                        <span class="patient-id">ID: {{patient.NationalId || 'N/A'}}</span>
+                    </div>
+                    <div class="patient-contact">
+                        <span *ngIf="patient.Email">{{patient.Email}}</span>
+                        <span *ngIf="patient.Phone">{{patient.Phone}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selected-patients" *ngIf="selectedPatients.length > 0">
+                <h3>Selected Patients ({{selectedPatients.length}})</h3>
+                <div class="selected-patients-list">
+                    <div *ngFor="let patient of selectedPatients" class="selected-patient">
+                        <span>{{patient.FullName}}</span>
+                        <button class="btn-remove" (click)="removeSelectedPatient(patient); $event.stopPropagation()">
+                            <i class='bx bx-x'></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="closeEnrollModal()">Cancel</button>
+                <button type="button" class="btn-enroll-confirm" [disabled]="selectedPatients.length === 0"
+                    (click)="enrollPatients()">
+                    Enroll {{selectedPatients.length}} Patient{{selectedPatients.length !== 1 ? 's' : ''}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

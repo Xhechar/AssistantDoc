@@ -1,6 +1,6 @@
 import { ServiceResponse } from "../assist.doc.interfaces";
 
-export class Response {
+export class FormattedResponse {
   static success<T>(message: string, object?: T, objects?: T[]): ServiceResponse<T> {
     return {
       success: true,
@@ -21,12 +21,12 @@ export class Response {
     };
   }
 
-  static auth<T>(token: string, role: string, user: T): ServiceResponse<T> {
+  static auth<T>(token: string, role: string): ServiceResponse<T> {
     return {
       success: true,
       message: "Authentication successful",
       error: null,
-      object: user,
+      object: null,
       token,
       role
     };

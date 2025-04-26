@@ -1,1 +1,232 @@
-<p>patients works!</p>
+<!-- Page Header -->
+<div class="page-header">
+    <div class="header-content">
+        <h1>Patients Management</h1>
+        <p>Manage all your patients in one place</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn-primary" (click)="openPatientForm()">
+            <i class="bx bx-plus"></i> Add New Patient
+        </button>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-container">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bx bx-user"></i>
+        </div>
+        <div class="stat-details">
+            <h3>{{patients.length}}</h3>
+            <p>Total Patients</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bx bx-calendar-plus"></i>
+        </div>
+        <div class="stat-details">
+            <h3>{{getNewPatientsCount()}}</h3>
+            <p>New This Month</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bx bx-pulse"></i>
+        </div>
+        <div class="stat-details">
+            <h3>{{getActiveEnrollmentsCount()}}</h3>
+            <p>Active Enrollments</p>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filter -->
+<div class="filter-container">
+    <div class="search-box">
+        <i class="bx bx-search"></i>
+        <input type="text" placeholder="Search patients..." [(ngModel)]="searchTerm" (input)="applyFilters()">
+    </div>
+    <div class="filter-box">
+        <select [(ngModel)]="filterOption" (change)="applyFilters()">
+            <option value="all">All Patients</option>
+            <option value="recent">Recently Added</option>
+            <option value="enrolled">Enrolled</option>
+        </select>
+    </div>
+</div>
+
+<!-- Patients List -->
+<div class="patients-list">
+    <div class="patients-table">
+        <div class="table-header">
+            <div class="header-cell">Name</div>
+            <div class="header-cell">Email</div>
+            <div class="header-cell">Phone</div>
+            <div class="header-cell">Date Added</div>
+            <div class="header-cell">Enrollments</div>
+            <div class="header-cell">Actions</div>
+        </div>
+
+        <div *ngIf="filteredPatients.length === 0" class="no-results">
+            <i class="bx bx-search-alt"></i>
+            <h3>No patients found</h3>
+            <p>Try adjusting your search or filters</p>
+        </div>
+
+        <div class="table-row" *ngFor="let patient of filteredPatients">
+            <div class="cell patient-name">
+                <div class="patient-avatar">{{ patient.FullName.charAt(0) }}</div>
+                <span>{{ patient.FullName }}</span>
+            </div>
+            <div class="cell">{{ patient.Email || 'N/A' }}</div>
+            <div class="cell">{{ patient.Phone || 'N/A' }}</div>
+            <div class="cell">{{ patient.DateCreated | date:'mediumDate' }}</div>
+            <div class="cell">
+                <span *ngIf="patient.Enrollments?.length" class="enrollment-tag">{{ patient.Enrollments?.length }}
+                    Programs</span>
+                <span *ngIf="!patient.Enrollments?.length" class="enrollment-tag empty">No Enrollments</span>
+            </div>
+            <div class="cell actions">
+                <button class="action-btn view" (click)="viewPatient(patient)" title="View Patient">
+                    <i class="bx bx-show"></i>
+                </button>
+                <button class="action-btn edit" (click)="editPatient(patient)" title="Edit Patient">
+                    <i class="bx bx-edit"></i>
+                </button>
+                <button class="action-btn share" (click)="sharePatient(patient)" title="Share Patient Profile">
+                    <i class="bx bx-share-alt"></i>
+                </button>
+                <button class="action-btn delete" (click)="confirmDelete(patient)" title="Delete Patient">
+                    <i class="bx bx-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="pagination">
+        <button class="pagination-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+            <i class="bx bx-chevron-left"></i>
+        </button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="pagination-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+            <i class="bx bx-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Patient Form Modal -->
+<div class="overlay" [class.active]="showPatientForm" (click)="closePatientForm()"></div>
+<div class="modal patient-form-modal" [class.active]="showPatientForm">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>{{ isEditMode ? 'Update Patient' : 'Add New Patient' }}</h3>
+            <button class="close-btn" (click)="closePatientForm()">
+                <i class="bx bx-x"></i>
+            </button>
+        </div>
+
+        <form [formGroup]="patientForm" (ngSubmit)="savePatient()">
+            <div class="form-group">
+                <label for="FullName">Full Name <span class="required">*</span></label>
+                <input type="text" id="FullName" formControlName="FullName" placeholder="Enter full name">
+                <div class="error-message"
+                    *ngIf="patientForm.get('FullName')?.invalid && (patientForm.get('FullName')?.dirty || patientForm.get('FullName')?.touched)">
+                    <span *ngIf="patientForm.get('FullName')?.errors?.['required']">Full name is required</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input type="email" id="Email" formControlName="Email" placeholder="Enter email address">
+                <div class="error-message"
+                    *ngIf="patientForm.get('Email')?.invalid && (patientForm.get('Email')?.dirty || patientForm.get('Email')?.touched)">
+                    <span *ngIf="patientForm.get('Email')?.errors?.['email']">Please enter a valid email</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="Phone">Phone</label>
+                <input type="tel" id="Phone" formControlName="Phone" placeholder="Enter phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="DateOfBirth">Date of Birth</label>
+                <input type="date" id="DateOfBirth" formControlName="DateOfBirth">
+            </div>
+
+            <div class="form-group">
+                <label for="NationalId">National ID</label>
+                <input type="text" id="NationalId" formControlName="NationalId" placeholder="Enter national ID number">
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" (click)="closePatientForm()">Cancel</button>
+                <button type="submit" class="btn-primary" [disabled]="patientForm.invalid">
+                    {{ isEditMode ? 'Update Patient' : 'Add Patient' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="overlay" [class.active]="showDeleteConfirmation" (click)="cancelDelete()"></div>
+<div class="modal delete-modal" [class.active]="showDeleteConfirmation">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Confirm Delete</h3>
+            <button class="close-btn" (click)="cancelDelete()">
+                <i class="bx bx-x"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="warning-icon">
+                <i class="bx bx-error-circle"></i>
+            </div>
+            <p>Are you sure you want to delete <strong>{{ patientToDelete?.FullName }}</strong>?</p>
+            <p class="warning-text">This action cannot be undone.</p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="cancelDelete()">Cancel</button>
+            <button class="btn-danger" (click)="deletePatient()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Share Patient Modal -->
+<div class="overlay" [class.active]="showShareModal" (click)="closeShareModal()"></div>
+<div class="modal share-modal" [class.active]="showShareModal">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Share Patient Profile</h3>
+            <button class="close-btn" (click)="closeShareModal()">
+                <i class="bx bx-x"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <p>Share <strong>{{ selectedPatient?.FullName }}</strong>'s profile link:</p>
+            <div class="share-link-container">
+                <input type="text" [value]="patientShareUrl" readonly #shareUrlInput>
+                <button class="copy-btn" (click)="copyShareLink(shareUrlInput)" title="Copy to clipboard">
+                    <i class="bx bx-copy"></i>
+                </button>
+            </div>
+            <div class="share-options">
+                <button class="share-option-btn" title="Share via Email">
+                    <i class="fas fa-envelope"></i>
+                </button>
+                <button class="share-option-btn" title="Share via WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </button>
+                <button class="share-option-btn" title="Share via SMS">
+                    <i class="fas fa-sms"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
