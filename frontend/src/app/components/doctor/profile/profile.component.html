@@ -1,1 +1,315 @@
-<p>profile works!</p>
+<div class="profile-container">
+    <!-- Profile Header with Quick Stats -->
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <div class="avatar-container">
+                <img src="https://ui-avatars.com/api/?name={{user.FullName}}&background=4e6af0&color=fff"
+                    alt="{{user.FullName}}">
+                <div class="avatar-status online"></div>
+            </div>
+        </div>
+        <div class="profile-info">
+            <h2>{{user.FullName}}</h2>
+            <p class="role"><i class="fa fa-user-shield"></i> {{user.Role || 'Staff'}}</p>
+            <div class="contact-info">
+                <span><i class="fa fa-envelope"></i> {{user.Email}}</span>
+                <span><i class="fa fa-phone"></i> {{user.Phone}}</span>
+            </div>
+        </div>
+        <div class="profile-actions">
+            <button class="btn-edit" (click)="editProfile()">
+                <i class="fa fa-edit"></i> Edit Profile
+            </button>
+            <button class="btn-settings">
+                <i class="fa fa-cog"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Summary -->
+    <div class="stats-summary">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bx bxs-folder"></i>
+            </div>
+            <div class="stat-details">
+                <h3>{{user.ProgramsCreated?.length || 0}}</h3>
+                <p>Programs Created</p>
+            </div>
+            <div class="stat-progress">
+                <div class="progress-bar" [style.width]="getProgressWidth(user.ProgramsCreated?.length || 0, 10)"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bx bxs-user-plus"></i>
+            </div>
+            <div class="stat-details">
+                <h3>{{getEnrollmentsCount()}}</h3>
+                <p>Patients Enrolled</p>
+            </div>
+            <div class="stat-progress">
+                <div class="progress-bar" [style.width]="getProgressWidth(getEnrollmentsCount(), 20)"></div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bx bxs-calendar"></i>
+            </div>
+            <div class="stat-details">
+                <h3>{{getDaysActive()}}</h3>
+                <p>Days Active</p>
+            </div>
+            <div class="stat-progress">
+                <div class="progress-bar" [style.width]="getProgressWidth(getDaysActive(), 180)"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="profile-tabs">
+        <div class="tab" [class.active]="activeTab === 'programs'" (click)="setActiveTab('programs')">
+            <i class="bx bxs-folder"></i> Programs
+        </div>
+        <div class="tab" [class.active]="activeTab === 'enrollments'" (click)="setActiveTab('enrollments')">
+            <i class="bx bxs-user-check"></i> Enrollments
+        </div>
+        <div class="tab" [class.active]="activeTab === 'activity'" (click)="setActiveTab('activity')">
+            <i class="bx bxs-bar-chart-alt-2"></i> Activity
+        </div>
+        <div class="tab" [class.active]="activeTab === 'settings'" (click)="setActiveTab('settings')">
+            <i class="bx bxs-cog"></i> Settings
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Programs Tab -->
+        <div class="tab-pane" *ngIf="activeTab === 'programs'">
+            <div class="section-header">
+                <h3>Programs Created</h3>
+                <button class="btn-primary">
+                    <i class="fa fa-plus"></i> New Program
+                </button>
+            </div>
+
+            <div class="program-cards">
+                <div class="program-card" *ngFor="let program of user.ProgramsCreated">
+                    <div class="program-header">
+                        <h4>{{program.ProgramName}}</h4>
+                        <div class="program-actions">
+                            <button class="btn-icon" title="Edit Program">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button class="btn-icon" title="Delete Program">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="program-description">{{program.Description || 'No description available'}}</p>
+                    <div class="program-meta">
+                        <span><i class="bx bxs-calendar"></i> Created: {{program.DateCreated |
+                            date:'mediumDate'}}</span>
+                        <span><i class="bx bxs-user-detail"></i> Enrollments: {{program.Enrollments?.length ||
+                            0}}</span>
+                    </div>
+                    <div class="program-footer">
+                        <button class="btn-secondary">View Details</button>
+                    </div>
+                </div>
+
+                <div class="empty-state" *ngIf="!user.ProgramsCreated?.length">
+                    <i class="bx bxs-folder-open"></i>
+                    <p>No programs created yet</p>
+                    <button class="btn-primary">Create Your First Program</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enrollments Tab -->
+        <div class="tab-pane" *ngIf="activeTab === 'enrollments'">
+            <div class="section-header">
+                <h3>Patients Enrolled</h3>
+                <div class="search-container">
+                    <i class="fa fa-search"></i>
+                    <input type="text" placeholder="Search enrollments..." [(ngModel)]="searchTerm">
+                </div>
+            </div>
+
+            <div class="enrollment-table-container">
+                <table class="enrollment-table">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Program</th>
+                            <th>Date Enrolled</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let enrollment of filteredEnrollments()">
+                            <td>
+                                <div class="patient-info">
+                                    <img src="https://ui-avatars.com/api/?name={{enrollment.Patient?.FullName}}&background=ff6b6b&color=fff"
+                                        alt="Patient">
+                                    <span>{{enrollment.Patient?.FullName}}</span>
+                                </div>
+                            </td>
+                            <td>{{enrollment.Program?.ProgramName}}</td>
+                            <td>{{enrollment.DateCreated | date:'shortDate'}}</td>
+                            <td>
+                                <span class="status-badge" [ngClass]="enrollment.Status.toLowerCase()">
+                                    {{enrollment.Status}}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <button class="btn-icon" title="View Details">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="btn-icon" title="Edit Enrollment">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="btn-icon" title="Remove Enrollment">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="empty-state" *ngIf="!filteredEnrollments().length">
+                    <i class="bx bxs-user-x"></i>
+                    <p>No enrollments found</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div class="tab-pane" *ngIf="activeTab === 'activity'">
+            <div class="section-header">
+                <h3>Recent Activity</h3>
+                <div class="filter-container">
+                    <select [(ngModel)]="activityFilter">
+                        <option value="all">All Activity</option>
+                        <option value="programs">Programs</option>
+                        <option value="enrollments">Enrollments</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="activity-timeline">
+                <div class="timeline-item" *ngFor="let activity of filteredActivity()">
+                    <div class="timeline-icon" [ngClass]="activity.type">
+                        <i [class]="activity.icon"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4>{{activity.title}}</h4>
+                        <p>{{activity.description}}</p>
+                        <span class="timeline-date">
+                            <i class="fa fa-clock"></i> {{activity.date | date:'medium'}}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="empty-state" *ngIf="!filteredActivity().length">
+                    <i class="bx bxs-time"></i>
+                    <p>No recent activity</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-pane" *ngIf="activeTab === 'settings'">
+            <div class="section-header">
+                <h3>Account Settings</h3>
+            </div>
+
+            <div class="settings-form">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" [(ngModel)]="settingsForm.fullName" placeholder="Your full name">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" [(ngModel)]="settingsForm.email" placeholder="Your email address">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" [(ngModel)]="settingsForm.phone" placeholder="Your phone number">
+                </div>
+
+                <div class="form-group">
+                    <label>Role</label>
+                    <select [(ngModel)]="settingsForm.role">
+                        <option value="Admin">Admin</option>
+                        <option value="Doctor">Doctor</option>
+                        <option value="Nurse">Nurse</option>
+                        <option value="Staff">Staff</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-input">
+                        <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="settingsForm.password"
+                            placeholder="Change password">
+                        <button class="toggle-password" (click)="togglePasswordVisibility()">
+                            <i [class]="showPassword ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <div class="password-input">
+                        <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="settingsForm.confirmPassword"
+                            placeholder="Confirm new password">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn-secondary" (click)="resetForm()">Cancel</button>
+                    <button class="btn-primary" (click)="saveSettings()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" [class.active]="showConfirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>{{confirmationModalTitle}}</h3>
+                <button class="close-modal" (click)="closeConfirmationModal()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>{{confirmationModalMessage}}</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="closeConfirmationModal()">Cancel</button>
+                <button class="btn-primary" (click)="confirmAction()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" [class.show]="showToast" [class.success]="toastType === 'success'"
+        [class.error]="toastType === 'error'">
+        <div class="toast-icon">
+            <i [class]="toastType === 'success' ? 'fa fa-check-circle' : 'fa fa-exclamation-circle'"></i>
+        </div>
+        <div class="toast-message">{{toastMessage}}</div>
+        <button class="toast-close" (click)="closeToast()">
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
+</div>

@@ -9,6 +9,7 @@ import { PatientsComponent } from './components/doctor/patients/patients.compone
 import { EnrollmentsComponent } from './components/doctor/enrollments/enrollments.component';
 import { ProgramsComponent } from './components/doctor/programs/programs.component';
 import { ProfileComponent } from './components/doctor/profile/profile.component';
+import { NotificationComponent } from './components/notification/notification.component';
 
 export const routes: Routes = [
     {path: '', component: LandingComponent},
@@ -16,12 +17,13 @@ export const routes: Routes = [
     {path: 'login', component: LoginComponent},
     {path: 'register', component: SignupComponent},
     {path: 'patient/:PatientId', component: PatientComponent},
-    {path: 'profile', component: ProfileComponent},
+    {path: 'notification', component: NotificationComponent},
     {path: 'doctor', component: DoctorComponent, children: [
         {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
         {path: 'dashboard', component: DashboardComponent},
         {path: 'patients', component: PatientsComponent},
         {path: 'enrollments', component: EnrollmentsComponent},
-        {path: 'programs', component: ProgramsComponent}
+        {path: 'programs', component: ProgramsComponent},
+        {path: 'profile', component: ProfileComponent}
     ]}
 ];

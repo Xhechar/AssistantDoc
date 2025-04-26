@@ -38,16 +38,6 @@ export class SignupComponent implements OnInit {
   }
   
   onSubmit(formValue: any): void {
-    console.log('Form submitted:', formValue);
-    // Here you would typically send the data to your backend API
-    // For example:
-    // this.authService.register(this.registerModel).subscribe(
-    //   (response) => {
-    //     // Handle successful registration
-    //   },
-    //   (error) => {
-    //     // Handle registration error
-    //   }
-    // );
+    
   }
 }

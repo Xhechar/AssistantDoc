@@ -1,3 +1,4 @@
+<app-notification></app-notification>
 <div class="login-container">
     <div class="login-content">
         <div class="login-info">
@@ -8,7 +9,7 @@
             <h1>Welcome Back</h1>
             <p>Access your dashboard to manage patients, appointments, and health programs with ease.</p>
             <div class="login-image">
-                <img src="/api/placeholder/400/320" alt="Doctor with tablet">
+                <img src="../../../images/doct.png" alt="Doctor with tablet">
             </div>
         </div>
 
@@ -20,7 +21,7 @@
                 <h3>Log In</h3>
             </div>
 
-            <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm.value)" novalidate>
+            <form #loginForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
                 <!-- Email -->
                 <div class="form-group">
                     <label for="email">Email Address</label>

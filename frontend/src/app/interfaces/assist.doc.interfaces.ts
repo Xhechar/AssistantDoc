@@ -60,3 +60,16 @@ export interface LoginDetails {
   Email: string;
   Password: string;
 }
+
+export enum NotificationType {
+  Success = 'success',
+  Error = 'error',
+  Info = 'info',
+  Warning = 'warning'
+}
+
+export interface SuccessMessage {
+  notificationType: NotificationType,
+  message: string,
+  title?: string
+}

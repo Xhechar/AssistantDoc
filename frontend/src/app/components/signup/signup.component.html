@@ -85,7 +85,7 @@
                             [(ngModel)]="registerModel.Password" #password="ngModel" required minlength="8"
                             pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
                             placeholder="Create a password">
-                        <i class="toggle-password" [class.bx-show]="!showPassword" [class.bx-hide]="showPassword"
+                        <i class="toggle-password bx" [class.bx-show]="!showPassword" [class.bx-hide]="showPassword"
                             (click)="togglePasswordVisibility('password')"></i>
                     </div>
                     <div class="error-message" *ngIf="password.invalid && (password.dirty || password.touched)">

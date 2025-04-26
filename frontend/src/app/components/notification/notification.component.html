@@ -1,0 +1,23 @@
+<div class="notification-container" [class.show]="visible">
+    <div class="notification" [ngClass]="notificationType">
+        <div class="notification-icon">
+            <i class="{{getNotificationIcon()}}"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-header" *ngIf="showTitle()">
+                <h4>{{getNotificationTitle()}}</h4>
+            </div>
+            <div class="notification-message">
+                {{message}}
+            </div>
+        </div>
+        <button class="notification-close" (click)="closeNotification()">
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Progress bar for auto-dismiss -->
+    <div class="notification-progress" *ngIf="autoDismiss">
+        <div class="progress-bar" [style.width]="progressWidth + '%'"></div>
+    </div>
+</div>

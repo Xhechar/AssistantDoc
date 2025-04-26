@@ -1,1 +1,179 @@
-<p>patient works!</p>
+<!-- Patient Profile Main Container -->
+<div class="profile-container">
+    <!-- Back Button -->
+    <div class="back-button">
+        <button (click)="goBack()">
+            <i class="fas fa-arrow-left"></i> Back
+        </button>
+    </div>
+
+    <!-- Header Section -->
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <div class="avatar-container">
+                <span>{{ getInitials(patient?.FullName) }}</span>
+            </div>
+        </div>
+        <div class="profile-info">
+            <h1>{{ patient?.FullName || 'Patient Name' }}</h1>
+            <div class="patient-id">
+                <span><i class="fas fa-id-card"></i> Patient ID: {{ patient?.PatientId }}</span>
+            </div>
+            <div class="patient-basic-info">
+                <span *ngIf="patient?.DateOfBirth"><i class="fas fa-birthday-cake"></i> {{ patient?.DateOfBirth |
+                    date:'mediumDate' }}</span>
+                <span *ngIf="patient?.Email"><i class="fas fa-envelope"></i> {{ patient?.Email }}</span>
+                <span *ngIf="patient?.Phone"><i class="fas fa-phone"></i> {{ patient?.Phone }}</span>
+                <span *ngIf="patient?.NationalId"><i class="fas fa-passport"></i> ID: {{ patient?.NationalId }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bx bx-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ getTotalEnrollments() }}</h3>
+                <p>Total Programs</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bx bx-time"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ getDaysAsMember() }}</h3>
+                <p>Days as Member</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bx bx-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ getActiveEnrollments() }}</h3>
+                <p>Active Programs</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <div class="tabs-container">
+        <div class="tabs-header">
+            <div class="tab" [class.active]="activeTab === 'enrollments'" (click)="setActiveTab('enrollments')">
+                <i class="fas fa-list-ul"></i> Enrollments
+            </div>
+            <div class="tab" [class.active]="activeTab === 'timeline'" (click)="setActiveTab('timeline')">
+                <i class="fas fa-history"></i> Timeline
+            </div>
+            <div class="tab" [class.active]="activeTab === 'settings'" (click)="setActiveTab('settings')">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Enrollments Tab -->
+            <div *ngIf="activeTab === 'enrollments'" class="enrollments-tab">
+                <div class="no-data" *ngIf="!patient?.Enrollments || patient.Enrollments.length === 0">
+                    <i class="bx bx-info-circle"></i>
+                    <p>No enrollments found for this patient.</p>
+                </div>
+
+                <div class="enrollment-list" *ngIf="patient?.Enrollments && patient.Enrollments.length > 0">
+                    <div class="enrollment-card" *ngFor="let enrollment of patient.Enrollments">
+                        <div class="enrollment-status" [class]="enrollment.Status.toLowerCase()">
+                            {{ enrollment.Status }}
+                        </div>
+                        <div class="enrollment-details">
+                            <h3>{{ enrollment.Program?.ProgramName }}</h3>
+                            <p *ngIf="enrollment.Program?.Description">{{ enrollment.Program?.Description }}</p>
+                            <div class="enrollment-meta">
+                                <span><i class="fas fa-calendar"></i> Enrolled: {{ enrollment.DateCreated |
+                                    date:'mediumDate' }}</span>
+                                <span *ngIf="enrollment.EnrolledBy"><i class="fas fa-user"></i> By: {{
+                                    enrollment.EnrolledBy?.FullName }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline Tab -->
+            <div *ngIf="activeTab === 'timeline'" class="timeline-tab">
+                <div class="timeline">
+                    <div class="timeline-item" *ngFor="let event of timelineEvents">
+                        <div class="timeline-icon" [class]="event.type">
+                            <i [class]="event.icon"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h3>{{ event.title }}</h3>
+                            <p>{{ event.description }}</p>
+                            <span class="timeline-date">{{ event.date | date:'medium' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div *ngIf="activeTab === 'settings'" class="settings-tab">
+                <h2>Edit Patient Information</h2>
+                <form (ngSubmit)="updatePatient()" #patientForm="ngForm">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" [(ngModel)]="editPatient.FullName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" [(ngModel)]="editPatient.Email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" name="phone" [(ngModel)]="editPatient.Phone">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" name="dateOfBirth"
+                            [ngModel]="editPatient.DateOfBirth | date:'yyyy-MM-dd'"
+                            (ngModelChange)="editPatient.DateOfBirth = $event">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nationalId">National ID</label>
+                        <input type="text" id="nationalId" name="nationalId" [(ngModel)]="editPatient.NationalId">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" (click)="resetForm()">Cancel</button>
+                        <button type="submit" class="btn-primary" [disabled]="!patientForm.form.valid">Save
+                            Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal" [class.active]="showConfirmModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>{{ modalTitle }}</h2>
+            <button class="close-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <p>{{ modalMessage }}</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+            <button class="btn-primary" (click)="confirmAction()">Confirm</button>
+        </div>
+    </div>
+</div>
+<div class="overlay" [class.active]="showConfirmModal" (click)="closeModal()"></div>
