@@ -1,63 +1,108 @@
-import { User } from "@prisma/client";
-import { RegisterUserDto, UpdateUserDto } from "../interfaces/assist.doc.dtos";
-import { ServiceResponse } from "../interfaces/assist.doc.interfaces";
+import { ExtendedRequest } from "../interfaces/assist.doc.interfaces";
 import { UserService } from "../services/user.service";
 import { Request, Response } from "express";
 import { FormattedResponse } from "../interfaces/helper/service.response";
+import { getIdFromToken } from "../middlewares/verify.tokens";
 
 let userService = new UserService();
 
 export class UserController {
-    registerUser(req: Request, res: Response) {
-        
+    async registerUser(req: Request, res: Response) {
+        try {
+            let result = await userService.registerUser(req.body);
+
+            if (result.success) {
+                return res.status(200).json(result);
+            }
+
+            return res.status(404).json(result);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown server error';
+            res.status(500).json(FormattedResponse.failure(message, 'Server Error'));
+        }
     }
-    
+
     async loginUser(req: Request, res: Response) {
         try {
-            
             let result = await userService.loginUser(req.body);
-            
-            if(result.success) {
+
+            if (result.success) {
                 res.cookie('token', result.token as string, {
                     httpOnly: true,
                     secure: false,
                     sameSite: 'strict',
-                    maxAge: 15*60*1000,
+                    maxAge: 15 * 60 * 1000,
                     signed: true
                 });
-                
-                let {token, ...rest} = result;
-                return res.status(201).json(rest);
+
+                let { token, ...rest } = result;
+                return res.status(200).json(rest);
             }
-            
-            return res.status(201).json(result);
+
+            return res.status(400).json(result);
         } catch (error) {
-            return res.status(501).json({
-                error: error
-            });
+            const message = error instanceof Error ? error.message : 'Unknown server error';
+            return res.status(500).json(FormattedResponse.failure(message, 'Server Error'));
         }
     }
 
     async logoutUser(req: Request, res: Response) {
         try {
-            res.clearCookie('token', {signed: true});
+            res.clearCookie('token', { signed: true });
 
-            return res.status(201).json(FormattedResponse.success('logout successfully, you are always welcomed'));
-        } catch(error) {
-        return res.status(501).json({
-            'error': error
-        })
+            return res.status(200).json(FormattedResponse.success('Logout successful, you are always welcomed'));
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown server error';
+            return res.status(500).json(FormattedResponse.failure(message, 'Server Error'));
         }
     }
 
-    getUserById(userId: string): Promise<ServiceResponse<User>> {
-        throw new Error("Method not implemented.");
+    async getUserById(req: ExtendedRequest, res: Response) {
+        try {
+
+            let result = await userService.getUserById(getIdFromToken(req));
+
+            if (result.success) {
+                return res.status(200).json(result);
+            }
+
+            return res.status(404).json(result);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown server error';
+            return res.status(500).json(FormattedResponse.failure(message, 'Server Error'));
+        }
     }
-    updateUser(userId: string, dto: UpdateUserDto, performedBy?: string): Promise<ServiceResponse<void>> {
-        throw new Error("Method not implemented.");
+
+    async updateUser(req: ExtendedRequest, res: Response) {
+        try {
+
+            let result = await userService.updateUser(getIdFromToken(req), req.body);
+
+            if (result.success) {
+                return res.status(200).json(result);
+            }
+
+            return res.status(400).json(result);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown server error';
+            return res.status(500).json(FormattedResponse.failure(message, 'Server Error'));
+        }
     }
-    deleteUser(userId: string, performedBy?: string): Promise<ServiceResponse<void>> {
-        throw new Error("Method not implemented.");
+
+    async deleteUser(req: Request, res: Response) {
+        try {
+            const { userId } = req.params;
+
+            let result = await userService.deleteUser(userId);
+
+            if (result.success) {
+                return res.status(200).json(result);
+            }
+
+            return res.status(400).json(result);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown server error';
+            return res.status(500).json(FormattedResponse.failure(message, 'Server Error'));
+        }
     }
-    
 }

@@ -111,20 +111,15 @@ export class ProgramService implements IProgramService {
         return FormattedResponse.success('Program deleted successfully.');
     }
 
-    async getProgramById(programId: string, userId: string): Promise<ServiceResponse<Program>> {
-        let userExists = await this.prisma.user.findUnique({
-            where: {
-                UserId: userId
-            }
-        });
-
-        if (!userExists) {
-            return FormattedResponse.failure('Access not authorised.', 'User not found');
-        }
+    async getProgramById(programId: string): Promise<ServiceResponse<Program>> {
 
         let program = await this.prisma.program.findUnique({
             where: {
                 ProgramId: programId
+            },
+            include: {
+                CreatedBy: true,
+                Enrollments: true
             }
         });
 
@@ -139,6 +134,9 @@ export class ProgramService implements IProgramService {
         let userExists = await this.prisma.user.findUnique({
             where: {
                 UserId: userId
+            },
+            include: {
+                Enrollments: true
             }
         });
 

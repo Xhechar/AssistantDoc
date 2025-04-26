@@ -111,7 +111,7 @@ export class UserService implements IUserService {
 
         return FormattedResponse.success<User>('User found.', userExists);
     }
-    async updateUser(userId: string, dto: UpdateUserDto, performedBy?: string): Promise<ServiceResponse<void>> {
+    async updateUser(userId: string, dto: UpdateUserDto): Promise<ServiceResponse<void>> {
         let {error} = registerUserSchema.validate(dto);
 
         if (error) {
@@ -143,10 +143,7 @@ export class UserService implements IUserService {
             return FormattedResponse.success('User updated successfully.');
         }
     }
-    async deleteUser(userId: string, performedBy?: string): Promise<ServiceResponse<void>> {
-        if (!performedBy) {
-            return FormattedResponse.failure('You are not allowed to perform this action.', 'Unauthorized action');
-        }
+    async deleteUser(userId: string): Promise<ServiceResponse<void>> {
 
         let userExists = await this.prisma.user.findUnique({
             where: {

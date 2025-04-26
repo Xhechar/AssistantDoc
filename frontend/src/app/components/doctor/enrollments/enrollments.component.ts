@@ -14,6 +14,7 @@ export class EnrollmentsComponent implements OnInit {
   // Data
   enrollments: Enrollment[] = [];
   filteredEnrollments: Enrollment[] = [];
+  displayedEnrollments: Enrollment[] = []; // Added to store paginated results
   
   // Pagination
   itemsPerPage: number = 5;
@@ -236,7 +237,7 @@ export class EnrollmentsComponent implements OnInit {
     // Apply pagination to filtered results
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    this.filteredEnrollments = this.filteredEnrollments.slice(startIndex, endIndex);
+    this.displayedEnrollments = this.filteredEnrollments.slice(startIndex, endIndex);
   }
 
   // Reset all filters

@@ -171,16 +171,7 @@ export class PatientService implements IPatientService {
         return FormattedResponse.success('Patient deleted successfully.');
     }
 
-    async getPatientById(patientId: string, userId: string): Promise<ServiceResponse<Patient>> {
-        let userExists = await this.prisma.user.findUnique({
-            where: {
-                UserId: userId
-            }
-        });
-
-        if (!userExists) {
-            return FormattedResponse.failure('User not found.', 'User not found');
-        }
+    async getPatientById(patientId: string): Promise<ServiceResponse<Patient>> {
 
         let patient = await this.prisma.patient.findUnique({
             where: {

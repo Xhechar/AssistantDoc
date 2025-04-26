@@ -1,6 +1,5 @@
-import { CreateProgramDto, EnrollPatientDto, LoginUserDto, RegisterPatientDto, RegisterUserDto, UpdateEnrollmentDto, UpdatePatientDto, UpdateProgramDto, UpdateUserDto } from "./assist.doc.dtos";
+import { CreateProgramDto, EnrollPatientDto, LoginUserDto, RegisterPatientDto, RegisterUserDto, UpdatePatientDto, UpdateProgramDto, UpdateUserDto } from "./assist.doc.dtos";
 import { ServiceResponse } from "./assist.doc.interfaces";
-import { EnrollmentStatus } from "./enums/enrollment.enum";
 import { Enrollment, Patient, PrismaClient, Program, User } from "@prisma/client";
 
 //user methods interface

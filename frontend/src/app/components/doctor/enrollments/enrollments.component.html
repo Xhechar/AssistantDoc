@@ -83,26 +83,26 @@
 
     <!-- Status Toggle -->
     <div class="status-toggle">
-        <button [ngClass]="{'active': activeTab === 'all'}" (click)="activeTab = 'all'">
+        <button [ngClass]="{'active': activeTab === 'all'}" (click)="activeTab = 'all'; applyFilters()">
             <i class="bx bx-list-ul"></i> All
         </button>
-        <button [ngClass]="{'active': activeTab === 'pending'}" (click)="activeTab = 'pending'">
+        <button [ngClass]="{'active': activeTab === 'pending'}" (click)="activeTab = 'pending'; applyFilters()">
             <i class="bx bx-time"></i> Pending
         </button>
-        <button [ngClass]="{'active': activeTab === 'completed'}" (click)="activeTab = 'completed'">
+        <button [ngClass]="{'active': activeTab === 'completed'}" (click)="activeTab = 'completed'; applyFilters()">
             <i class="bx bx-check-circle"></i> Completed
         </button>
     </div>
 
     <!-- Enrollment List -->
     <div class="enrollment-list">
-        <div *ngIf="filteredEnrollments.length === 0" class="no-enrollments">
+        <div *ngIf="displayedEnrollments.length === 0" class="no-enrollments">
             <i class="bx bx-search-alt"></i>
             <p>No enrollments found with the current filters</p>
             <button class="reset-btn" (click)="resetFilters()">Reset Filters</button>
         </div>
 
-        <div *ngFor="let enrollment of filteredEnrollments" class="enrollment-card"
+        <div *ngFor="let enrollment of displayedEnrollments" class="enrollment-card"
             [ngClass]="{'completed': enrollment.Status === 'Completed', 'pending': enrollment.Status === 'Pending'}">
             <div class="enrollment-header">
                 <div class="enrollment-status"
