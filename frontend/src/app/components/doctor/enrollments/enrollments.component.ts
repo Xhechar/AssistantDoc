@@ -48,8 +48,8 @@ export class EnrollmentsComponent implements OnInit {
   loadEnrollments(): void {
     this.enrollmentService.getAllEnrollments().subscribe({
       next: (response) => {
-        if (response.success && response.objects) {
-          this.enrollments = response.objects;
+        if (response.success && response.object) {
+          this.enrollments = response.object as unknown as Enrollment[];
           this.applyFilters();
           this.ns.showAlert({
             notificationType: NotificationType.Success,

@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit {
           ns.showAlert({
             notificationType: NotificationType.Success,
             message: response.message,
-            title: undefined
+            title: 'Success'
           });
 
           if (response.role == 'Doctor') {
@@ -54,7 +54,7 @@ export class LoginComponent implements OnInit {
           }
       },
         error: (error) => {
-          this.ns.showAlert({notificationType: NotificationType.Error, message: error.error.message as string, title: 'Internal Server Error'});
+          this.ns.showAlert({notificationType: NotificationType.Error, message: error.message as string, title: error.error as string});
         }
     })
   }

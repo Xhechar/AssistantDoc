@@ -16,16 +16,16 @@ export class ProgramService {
 
   constructor(private http: HttpClient) { }
 
-  createProgram(programDetails: CreateProgramDto): Observable<ServiceResponse<Program>> {
-    return this.http.post<ServiceResponse<Program>>(
+  createProgram(dto: CreateProgramDto): Observable<ServiceResponse<null>> {
+    return this.http.post<ServiceResponse<null>>(
       `${this.API_URL}createProgram`,
-      programDetails,
+      dto,
       { withCredentials: true }
     );
   }
 
-  updateProgram(programId: string, updatedDetails: UpdateProgramDto): Observable<ServiceResponse<Program>> {
-    return this.http.put<ServiceResponse<Program>>(
+  updateProgram(programId: string, updatedDetails: UpdateProgramDto): Observable<ServiceResponse<null>> {
+    return this.http.put<ServiceResponse<null>>(
       `${this.API_URL}updateProgram/${programId}`,
       updatedDetails,
       { withCredentials: true }

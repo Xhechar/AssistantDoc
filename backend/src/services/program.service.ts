@@ -22,7 +22,7 @@ export class ProgramService implements IProgramService {
             return FormattedResponse.failure('Access not authorised.', 'User not found');
         }
 
-        let {error} = createProgramSchema.validate(dto);
+        let {error} = createProgramSchema.validate({ProgramName: dto.ProgramName, Description: dto.Description});
 
         if (error) {
             return FormattedResponse.failure(error.message, 'Invalid Input Error');

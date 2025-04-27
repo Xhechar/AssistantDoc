@@ -11,11 +11,7 @@ export class UserController {
         try {
             let result = await userService.registerUser(req.body);
 
-            if (result.success) {
-                return res.status(200).json(result);
-            }
-
-            return res.status(404).json(result);
+            res.status(200).json(result);
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown server error';
             res.status(500).json(FormattedResponse.failure(message, 'Server Error'));

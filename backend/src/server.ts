@@ -12,7 +12,8 @@ dotenv.config();
 
 app.use(Express.json());
 app.use(Cors({
-  credentials: true
+    origin: "http://localhost:4200",
+    credentials: true
 }));
 app.use(cookieParser(process.env.COOKIE_SECRET as string));
 

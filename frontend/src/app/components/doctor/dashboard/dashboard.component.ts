@@ -63,8 +63,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   private fetchRecentPatients(): void {
     this.patientService.getAllPatients().subscribe({
       next: (response) => {
-        if (response.success && response.objects) {
-          this.recentPatients = response.objects;
+        if (response.success && response.object) {
+          this.recentPatients = response.object as unknown as Patient[];
           this.totalPatients = this.recentPatients.length;
           this.ns.showAlert({
             notificationType: NotificationType.Success,
@@ -93,12 +93,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   private fetchActivePrograms(): void {
     this.programService.getAllPrograms().subscribe({
       next: (response) => {
-        if (response.success && response.objects) {
-          this.activePrograms = response.objects;
+        if (response.success && response.object) {
+          this.activePrograms = response.object as unknown as Program[];
           this.totalPrograms = this.activePrograms.length;
           this.ns.showAlert({
             notificationType: NotificationType.Success,
-            message: 'Active programs loaded successfully',
+            message: response.message,
             title: 'Success'
           });
         } else {
@@ -112,8 +112,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.error.message as string || 'Failed to fetch active programs',
-          title: 'Error'
+          message: error.message as string || 'Failed to fetch active programs',
+          title: error.error as string
         });
       }
     });
@@ -123,12 +123,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   private fetchRecentEnrollments(): void {
     this.enrollmentService.getAllEnrollments().subscribe({
       next: (response) => {
-        if (response.success && response.objects) {
-          this.recentEnrollments = response.objects;
+        if (response.success && response.object) {
+          this.recentEnrollments = response.object as unknown as Enrollment[];
           this.totalEnrollments = this.recentEnrollments.length;
           this.ns.showAlert({
             notificationType: NotificationType.Success,
-            message: 'Recent enrollments loaded successfully',
+            message: response.message,
             title: 'Success'
           });
         } else {
@@ -142,8 +142,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.error.message as string || 'Failed to fetch recent enrollments',
-          title: 'Error'
+          message: error.message as string || 'Failed to fetch recent enrollments',
+          title: error.error as string
         });
       }
     });
@@ -219,12 +219,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   // View patient details
   viewPatientDetails(patientId: string): void {
-    this.router.navigate(['/clients/view', patientId]);
+    this.router.navigate(['/patient', patientId]);
   }
 
   // Enroll patient in a program
   enrollPatient(patientId: string): void {
-    this.router.navigate(['/enrollments/create'], { 
+    this.router.navigate(['/doctor/enrollments'], { 
       queryParams: { patientId: patientId }
     });
   }

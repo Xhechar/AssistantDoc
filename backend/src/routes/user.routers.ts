@@ -6,9 +6,7 @@ export const userRouter = Router();
 const userController = new UserController();
 
 // Register
-userRouter.post('/register', async (req, res) => {
-    await userController.registerUser(req, res);
-});
+userRouter.post('/register', userController.registerUser);
 
 // Login
 userRouter.post('/login', async (req, res) => {
@@ -16,7 +14,7 @@ userRouter.post('/login', async (req, res) => {
 });
 
 // Get user by ID
-userRouter.get('/getUserById/:userId', verifyToken, verifyAdmin, async (req, res) => {
+userRouter.get('/getUserById', verifyToken, verifyAdmin, async (req, res) => {
     await userController.getUserById(req, res);
 });
 

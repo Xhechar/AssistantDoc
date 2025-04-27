@@ -13,7 +13,7 @@ export const verifyToken = (req: ExtendedRequest, res: Response, next: NextFunct
 
   try {
 
-    jwt.verify(token, process.env.SECRET_KEY as string, (error: any, data: any) => {
+    jwt.verify(token, process.env.JWT_SECRET as string, (error: any, data: any) => {
       if (error) {
         if (error.name === 'JsonWebTokenError') {
           res.status(400).json(FormattedResponse.failure("Invalid token provided.", "Unauthorized"));

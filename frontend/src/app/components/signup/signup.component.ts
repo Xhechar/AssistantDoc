@@ -64,7 +64,7 @@ export class SignupComponent implements OnInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.error.message as string,
+          message: error.error as string,
           title: 'Internal Server Error'
         });
       }

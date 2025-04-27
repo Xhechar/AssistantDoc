@@ -23,7 +23,6 @@ export interface IPatientService {
   getPatientById(patientId: string, userId: string): Promise<ServiceResponse<Patient>>;
   getAllPatients(userId: string): Promise<ServiceResponse<Patient[]>>;
 }
-
 // Enrollment methods interface
 
 export interface IEnrollmentService {

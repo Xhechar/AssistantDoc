@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, NavigationEnd, RouterLink, RouterEvent, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
+import { User } from '../../interfaces/assist.doc.interfaces';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-doctor',
@@ -14,8 +16,9 @@ export class DoctorComponent implements OnInit {
   mobileMenuOpen: boolean = false;
   userMenuOpen: boolean = false;
   currentRoute: string = '';
+  user!: User;
   
-  constructor(private router: Router) {
+  constructor(private router: Router, private userService: UserService) {
     // Subscribe to router events to update active links
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
@@ -29,6 +32,22 @@ export class DoctorComponent implements OnInit {
   ngOnInit(): void {
     // Add listener for screen resize
     this.handleScreenResize();
+    this.fetchUserData();
+  }
+
+  fetchUserData(): void {
+    this.userService.getUserById().subscribe({
+      next: (response) => {
+        if (response.success && response.object) {
+          this.user = response.object;
+        } else {
+          // console.error('Failed to fetch user data:', response.message);
+        }
+      },
+      error: (error) => {
+        // console.error('Error fetching user data:', error);
+      }
+    });
   }
 
   // Toggle mobile menu

@@ -64,8 +64,8 @@ export class PatientsComponent implements OnInit {
   loadPatients(): void {
     this.patientService.getAllPatients().subscribe({
       next: (response) => {
-        if (response.success && response.objects) {
-          this.patients = response.objects;
+        if (response.success && response.object) {
+          this.patients = response.object as unknown as Patient[];
           this.applyFilters();
           this.ns.showAlert({
             notificationType: NotificationType.Success,
@@ -83,8 +83,8 @@ export class PatientsComponent implements OnInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.error.message as string || 'Failed to load patients',
-          title: 'Error'
+          message: error.message as string || 'Failed to load patients',
+          title: error.error as string
         });
       }
     });
@@ -158,8 +158,8 @@ export class PatientsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.error.message as string || 'Failed to update patient',
-            title: 'Error'
+            message: error.message as string || 'Failed to update patient',
+            title: error.error as string
           });
         }
       });
@@ -187,8 +187,8 @@ export class PatientsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.error.message as string || 'Failed to add patient',
-            title: 'Error'
+            message: error.message as string || 'Failed to add patient',
+            title: error.error as string
           });
         }
       });
@@ -230,8 +230,8 @@ export class PatientsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.error.message as string || 'Failed to delete patient',
-            title: 'Error'
+            message: error.message as string || 'Failed to delete patient',
+            title: error.error as string
           });
         }
       });
@@ -239,15 +239,26 @@ export class PatientsComponent implements OnInit {
   }
 
   viewPatient(patient: Patient): void {
-    // In a real application, navigate to patient details page
-    console.log('Viewing patient:', patient);
-    // this.router.navigate(['/patients', patient.PatientId]);
+    this.router.navigate(['/patient', patient.PatientId]);
   }
 
   sharePatient(patient: Patient): void {
     this.selectedPatient = patient;
-    this.patientShareUrl = `${window.location.origin}/patients/${patient.PatientId}`;
+    this.patientShareUrl = `${window.location.origin}/patient/${patient.PatientId}`;
     this.showShareModal = true;
+    navigator.clipboard.writeText(this.patientShareUrl).then(() => {
+      this.ns.showAlert({
+        notificationType: NotificationType.Success,
+        message: 'Link copied to clipboard',
+        title: 'Success'
+      });
+    }).catch(() => {
+      this.ns.showAlert({
+        notificationType: NotificationType.Error,
+        message: 'Failed to copy link to clipboard',
+        title: 'Error'
+      });
+    });
   }
 
   closeShareModal(): void {

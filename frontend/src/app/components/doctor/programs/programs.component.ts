@@ -28,6 +28,9 @@ export class ProgramsComponent implements OnInit {
   showEnrollModal: boolean = false;
   isEditMode: boolean = false;
 
+  // Program
+  currentProgramId: string = '';
+
   // Current program for operations
   currentProgram: Program = this.getEmptyProgram();
   programToDelete: Program | null = null;
@@ -55,8 +58,8 @@ export class ProgramsComponent implements OnInit {
     // Load programs
     this.programService.getAllPrograms().subscribe({
       next: (response) => {
-        if (response.success && response.objects) {
-          this.programs = response.objects;
+        if (response.success && response.object) {
+          this.programs = response.object as unknown as Program[];
           this.filteredPrograms = [...this.programs];
           // this.ns.showAlert({
           //   notificationType: NotificationType.Success,
@@ -74,8 +77,8 @@ export class ProgramsComponent implements OnInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.error.message as string || 'Failed to load programs',
-          title: 'Error'
+          message: error.message || 'Failed to load programs',
+          title: error.error as string
         });
       }
     });
@@ -83,26 +86,26 @@ export class ProgramsComponent implements OnInit {
     // Load patients
     this.patientService.getAllPatients().subscribe({
       next: (response) => {
-        if (response.success && response.objects) {
-          this.patients = response.objects;
+        if (response.success && response.object) {
+          this.patients = response.object as unknown as Patient[];
           // this.ns.showAlert({
           //   notificationType: NotificationType.Success,
           //   message: 'Patients loaded successfully',
           //   title: 'Success'
           // });
         } else {
-          this.ns.showAlert({
-            notificationType: NotificationType.Warning,
-            message: response.message,
-            title: response.error as string
-          });
+          // this.ns.showAlert({
+          //   notificationType: NotificationType.Warning,
+          //   message: response.message,
+          //   title: response.error as string
+          // });
         }
       },
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.error.message as string || 'Failed to load patients',
-          title: 'Error'
+          message: error.message as string || 'Failed to load patients',
+          title: error.error as string
         });
       }
     });
@@ -149,6 +152,7 @@ export class ProgramsComponent implements OnInit {
   }
 
   openProgramUpdateForm(program: Program): void {
+    this.currentProgramId = program.ProgramId;
     this.isEditMode = true;
     this.currentProgram = { ...program };
     this.showProgramForm = true;
@@ -167,24 +171,23 @@ export class ProgramsComponent implements OnInit {
       });
       return;
     }
+    
 
     if (this.isEditMode) {
-      // Update existing program
-      this.programService.updateProgram(this.currentProgram.ProgramId, {ProgramName: this.currentProgram.ProgramName, Description: this.currentProgram.Description}).subscribe({
+      this.programService.updateProgram(this.currentProgramId, {ProgramName: this.currentProgram.ProgramName, Description: this.currentProgram.Description}).subscribe({
         next: (response) => {
-          if (response.success && response.object) {
-            const index = this.programs.findIndex(p => p.ProgramId === this.currentProgram.ProgramId);
-            if (index !== -1) {
-              this.programs[index] = response.object;
-              this.filterPrograms();
-              this.closeProgramForm();
-              this.ns.showAlert({
-                notificationType: NotificationType.Success,
-                message: 'Program updated successfully',
-                title: 'Success'
-              });
-            }
+          if (response.success) {
+            this.currentProgramId = '';
+            this.loadData();
+            this.filterPrograms();
+            this.closeProgramForm();
+            this.ns.showAlert({
+              notificationType: NotificationType.Success,
+              message: 'Program updated successfully',
+              title: 'Success'
+            });
           } else {
+            this.currentProgramId = '';
             this.ns.showAlert({
               notificationType: NotificationType.Warning,
               message: response.message,
@@ -193,10 +196,11 @@ export class ProgramsComponent implements OnInit {
           }
         },
         error: (error) => {
+          this.currentProgramId = '';
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.error.message as string || 'Failed to update program',
-            title: 'Error'
+            message: error.message as string || 'Failed to update program',
+            title: error.error as string
           });
         }
       });
@@ -204,13 +208,13 @@ export class ProgramsComponent implements OnInit {
       // Add new program
       this.programService.createProgram(this.currentProgram).subscribe({
         next: (response) => {
-          if (response.success && response.object) {
-            this.programs.push(response.object);
+          if (response.success) {
+            this.loadData();
             this.filterPrograms();
             this.closeProgramForm();
             this.ns.showAlert({
               notificationType: NotificationType.Success,
-              message: 'Program created successfully',
+              message: response.message,
               title: 'Success'
               });
             } else {
@@ -224,8 +228,8 @@ export class ProgramsComponent implements OnInit {
           error: (error) => {
             this.ns.showAlert({
               notificationType: NotificationType.Error,
-              message: error.error.message as string || 'Failed to create program',
-              title: 'Error'
+              message: error.message as string || 'Failed to create program',
+              title: error.error as string
             });
           }
         });
@@ -268,8 +272,8 @@ export class ProgramsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.error.message as string || 'Failed to delete program',
-            title: 'Error'
+            message: error.message as string || 'Failed to delete program',
+            title: error.error as string
           });
         }
       });
@@ -366,8 +370,8 @@ export class ProgramsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.error.message as string || 'Failed to enroll patients',
-            title: 'Error'
+            message: error.message as string || 'Failed to enroll patients',
+            title: error.error as string
           });
         }
       });

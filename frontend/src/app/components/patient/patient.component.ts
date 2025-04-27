@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Patient, User, Program, Enrollment } from '../../interfaces/assist.doc.interfaces';
+import { Location } from '@angular/common';
+import { Patient, User, Program, Enrollment, NotificationType } from '../../interfaces/assist.doc.interfaces';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NotificationService } from '../../services/modal/notification.service';
+import { PatientService } from '../../services/patient.service';
 
 @Component({
   selector: 'app-patient',
@@ -23,130 +26,60 @@ export class PatientComponent implements OnInit {
   modalMessage: string = '';
   pendingAction: string = '';
 
+  patientId: string = '';
 
   constructor(
     private route: ActivatedRoute,
-    private location: Location
-  ) { }
-
-  ngOnInit(): void {
-    // Get patient ID from route params
+    private location: Location,
+    private patientService: PatientService,
+    private ns: NotificationService
+  ) { 
     const patientId = this.route.snapshot.paramMap.get('id');
     if (patientId) {
-      this.loadPatientData(patientId);
+      this.patientId = patientId;
+    } else {
+      this.ns.showAlert({
+        notificationType: NotificationType.Warning,
+        message: 'No patient ID provided',
+        title: 'Error'
+      });
     }
   }
 
-  loadPatientData(patientId: string): void {
-    // In a real application, this would be a service call
-    // For demo purposes, we're using dummy data
-    this.patient = this.getDummyPatient(patientId);
-    
-    // Initialize edit form with patient data
-    this.editPatient = { ...this.patient };
-    
+  ngOnInit(): void {
+    if (this.patientId) {
+      this.loadPatient(this.patientId);
+    }
   }
 
-  getDummyPatient(patientId: string): Patient {
-    // Create dummy users
-    const doctor: User = {
-      UserId: 'user-1',
-      FullName: 'Dr. Jane Smith',
-      Email: 'jane.smith@assistantdoc.com',
-      Phone: '+1234567890',
-      Password: '',
-      Role: 'Doctor',
-      IsWelcomed: true,
-      DateCreated: new Date('2023-01-15')
-    };
-    
-    const nurse: User = {
-      UserId: 'user-2',
-      FullName: 'Nurse Michael Johnson',
-      Email: 'michael.johnson@assistantdoc.com',
-      Phone: '+1987654321',
-      Password: '',
-      Role: 'Nurse',
-      IsWelcomed: true,
-      DateCreated: new Date('2023-02-10')
-    };
-    
-    // Create dummy programs
-    const diabetesProgram: Program = {
-      ProgramId: 'prog-1',
-      ProgramName: 'Diabetes Management',
-      Description: 'Comprehensive program for managing diabetes and preventing complications.',
-      DateCreated: new Date('2023-01-01'),
-      DateModified: new Date('2023-06-15'),
-      CreatedByUserId: doctor.UserId,
-      CreatedBy: doctor
-    };
-    
-    const hypertensionProgram: Program = {
-      ProgramId: 'prog-2',
-      ProgramName: 'Hypertension Control',
-      Description: 'Program designed to monitor and control high blood pressure.',
-      DateCreated: new Date('2023-02-01'),
-      DateModified: new Date('2023-07-10'),
-      CreatedByUserId: doctor.UserId,
-      CreatedBy: doctor
-    };
-    
-    const weightManagementProgram: Program = {
-      ProgramId: 'prog-3',
-      ProgramName: 'Weight Management',
-      Description: 'Program focused on healthy weight loss and maintenance.',
-      DateCreated: new Date('2023-03-15'),
-      DateModified: new Date('2023-08-20'),
-      CreatedByUserId: nurse.UserId,
-      CreatedBy: nurse
-    };
-    
-    // Create dummy enrollments
-    const enrollments: Enrollment[] = [
-      {
-        EnrollmentId: 'enr-1',
-        PatientId: patientId,
-        ProgramId: diabetesProgram.ProgramId,
-        EnrolledByUserId: doctor.UserId,
-        DateCreated: new Date('2023-06-01'),
-        Status: 'Active',
-        Program: diabetesProgram,
-        EnrolledBy: doctor
+  // Load patient data from API
+  loadPatient(patientId: string): void {
+    this.patientService.getPatientById(patientId).subscribe({
+      next: (response) => {
+        if (response.success && response.object) {
+          this.patient = response.object;
+          this.editPatient = { ...this.patient };
+          this.ns.showAlert({
+            notificationType: NotificationType.Success,
+            message: 'Patient data loaded successfully',
+            title: 'Success'
+          });
+        } else {
+          this.ns.showAlert({
+            notificationType: NotificationType.Warning,
+            message: response.message,
+            title: response.error as string
+          });
+        }
       },
-      {
-        EnrollmentId: 'enr-2',
-        PatientId: patientId,
-        ProgramId: hypertensionProgram.ProgramId,
-        EnrolledByUserId: nurse.UserId,
-        DateCreated: new Date('2023-07-15'),
-        Status: 'Active',
-        Program: hypertensionProgram,
-        EnrolledBy: nurse
-      },
-      {
-        EnrollmentId: 'enr-3',
-        PatientId: patientId,
-        ProgramId: weightManagementProgram.ProgramId,
-        EnrolledByUserId: doctor.UserId,
-        DateCreated: new Date('2023-08-30'),
-        Status: 'Completed',
-        Program: weightManagementProgram,
-        EnrolledBy: doctor
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message as string || 'Failed to load patient data',
+          title: 'Error'
+        });
       }
-    ];
-    
-    // Create dummy patient
-    return {
-      PatientId: patientId,
-      FullName: 'John Doe',
-      Phone: '+1555123456',
-      Email: 'john.doe@example.com',
-      DateOfBirth: new Date('1985-04-15'),
-      NationalId: 'ID123456789',
-      DateCreated: new Date('2023-05-20'),
-      Enrollments: enrollments
-    };
+    });
   }
 
   setActiveTab(tab: string): void {
@@ -182,8 +115,15 @@ export class PatientComponent implements OnInit {
   }
 
   updatePatient(): void {
-    // In a real application, this would be a service call
     if (this.patient) {
+      if (!this.editPatient.FullName?.trim()) {
+        this.ns.showAlert({
+          notificationType: NotificationType.Warning,
+          message: 'Patient name is required',
+          title: 'Invalid Input'
+        });
+        return;
+      }
       this.showModal(
         'Confirm Update', 
         'Are you sure you want to update this patient\'s information?',
@@ -192,8 +132,37 @@ export class PatientComponent implements OnInit {
     }
   }
 
+  executeUpdatePatient(): void {
+    this.patientService.updatePatient(this.editPatient.PatientId, {FullName: this.editPatient.FullName, NationalId: this.editPatient.NationalId, DateOfBirth: this.editPatient.DateOfBirth, Phone: this.editPatient.Phone}).subscribe({
+      next: (response) => {
+        if (response.success && response.object) {
+          this.patient = response.object;
+          this.loadPatient(this.patientId);
+          this.ns.showAlert({
+            notificationType: NotificationType.Success,
+            message: 'Patient updated successfully',
+            title: 'Success'
+          });
+        } else {
+          this.ns.showAlert({
+            notificationType: NotificationType.Warning,
+            message: response.message,
+            title: response.error as string
+          });
+        }
+      },
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message as string || 'Failed to update patient',
+          title: 'Error'
+        });
+      }
+    });
+  }
+
   goBack(): void {
-    // this.location.back();
+    this.location.back();
   }
 
   resetForm(): void {
@@ -216,7 +185,7 @@ export class PatientComponent implements OnInit {
 
   confirmAction(): void {
     if (this.pendingAction === 'updatePatient') {
-      // this.executeUpdatePatient();
+      this.executeUpdatePatient();
     }
     
     this.closeModal();
