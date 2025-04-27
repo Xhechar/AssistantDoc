@@ -139,17 +139,23 @@ label {
 
 .input-container {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
-.input-container i {
+/* Left icon (envelope, lock) */
+.input-container > i:first-child {
     position: absolute;
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
     color: var(--gray);
     font-size: 1.2rem;
+    z-index: 1;
+    pointer-events: none;
 }
 
+/* Toggle password visibility icon - completely redesigned */
 .toggle-password {
     position: absolute;
     right: 1rem;
@@ -158,21 +164,32 @@ label {
     color: var(--gray);
     font-size: 1.2rem;
     cursor: pointer;
-    transition: var(--transition);
+    background: transparent;
+    border: none;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
 }
 
 .toggle-password:hover {
     color: var(--primary);
 }
 
+/* Input fields */
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="text"] {
     width: 100%;
-    padding: 1rem 1rem 1rem 3rem;
+    height: 3.25rem;
+    padding: 0 3rem 0 3rem;
     border: 1px solid var(--gray-light);
     border-radius: 8px;
     font-size: 1rem;
     transition: var(--transition);
+    background-color: white;
 }
 
 input:focus {

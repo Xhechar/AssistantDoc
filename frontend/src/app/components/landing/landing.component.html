@@ -1,4 +1,4 @@
-<div class="overlay"></div>
+<div class="overlay" [class.active]="isMobileNavActive" (click)="closeMobileNav()"></div>
 
 <header>
     <nav class="navbar">
@@ -6,20 +6,20 @@
             <i class="fas fa-heartbeat"></i>
             <h1>AssistantDoc<span>+</span></h1>
         </div>
-        <div class="nav-links">
+        <div class="nav-links" [ngClass]="{'active': isMobileNavActive}">
             <ul>
-                <li><a href="#" class="active">Home</a></li>
-                <li><a href="#">Features</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Testimonials</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a (click)="scrollToSection('home')" class="active">Home</a></li>
+                <li><a (click)="scrollToSection('features')">Features</a></li>
+                <li><a (click)="scrollToSection('how-it-works')">About</a></li>
+                <li><a (click)="scrollToSection('testimonials')">Testimonials</a></li>
+                <li><a (click)="scrollToSection('cta')">Contact</a></li>
             </ul>
         </div>
         <div class="auth-buttons">
             <button routerLink="login" class="login-btn">Login</button>
             <button routerLink="register" class="signup-btn">Sign Up</button>
         </div>
-        <div class="hamburger">
+        <div class="hamburger" (click)="toggleMobileNav()">
             <i class="fas fa-bars"></i>
         </div>
     </nav>
@@ -27,13 +27,13 @@
 
 <main>
     <!-- Hero Section -->
-    <section class="hero">
+    <section id="home" class="hero">
         <div class="hero-content">
             <h1 class="reveal-text">Streamline Your <span>Healthcare Practice</span></h1>
             <p class="reveal-text delay-1">Efficiently manage clients, design personalized health programs, and grow
                 your practice with our comprehensive healthcare management platform.</p>
             <div class="cta-buttons reveal-text delay-2">
-                <button class="primary-btn">Get Started <i class="fas fa-arrow-right"></i></button>
+                <button class="primary-btn" routerLink="/register">Get Started <i class="fas fa-arrow-right"></i></button>
                 <button class="secondary-btn">Watch Demo <i class="fas fa-play"></i></button>
             </div>
         </div>
@@ -51,7 +51,7 @@
     </section>
 
     <!-- Features Section -->
-    <section class="features">
+    <section id="features" class="features">
         <div class="section-header">
             <h2>Powerful Features for <span>Healthcare Professionals</span></h2>
             <p>Everything you need to manage your practice and deliver excellent patient care</p>
@@ -97,7 +97,7 @@
     </section>
 
     <!-- How It Works -->
-    <section class="how-it-works">
+    <section id="how-it-works" class="how-it-works">
         <div class="section-header">
             <h2>How <span>AssistantDoc+</span> Works</h2>
             <p>Simple and intuitive process designed for healthcare professionals</p>
@@ -139,7 +139,7 @@
     </section>
 
     <!-- Testimonials -->
-    <section class="testimonials">
+    <section id="testimonials" class="testimonials">
         <div class="section-header">
             <h2>Trusted by <span>Healthcare Professionals</span></h2>
             <p>See what doctors are saying about our platform</p>
@@ -196,11 +196,11 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="cta">
+    <section id="cta" class="cta">
         <div class="cta-content">
             <h2>Ready to transform <span>your practice?</span></h2>
             <p>Join thousands of healthcare professionals who trust AssistantDoc+ to manage their practice efficiently.</p>
-            <button class="primary-btn large">Get Started Today <i class="fas fa-arrow-right"></i></button>
+            <button class="primary-btn large" routerLink="/register">Get Started Today <i class="fas fa-arrow-right"></i></button>
         </div>
         <div class="cta-image">
             <img src="/api/placeholder/500/400" alt="Healthcare professionals using AssistantDoc+">
@@ -256,7 +256,7 @@
     </div>
 
     <div class="footer-bottom">
-        <p>&copy; 2025 AssistantDoc+. All rights reserved.</p>
+        <p>© 2025 AssistantDoc+. All rights reserved.</p>
         <div class="footer-bottom-links">
             <a href="#">Terms of Service</a>
             <a href="#">Privacy Policy</a>
