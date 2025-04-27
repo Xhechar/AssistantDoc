@@ -10,12 +10,8 @@ const enrollmentService = new EnrollmentService();
 export class EnrollmentController {
     async enrollPatient(req: ExtendedRequest, res: Response) {
         try {
-            let newDto: EnrollPatientDto = {
-                ... req.body,
-                EnrolledByUserId: getIdFromToken(req)
-            }
 
-            const result = await enrollmentService.enrollPatient(newDto);
+            const result = await enrollmentService.enrollPatient(req.body.dtos, getIdFromToken(req));
             if (result.success) {
                 return res.status(200).json(result);
             }

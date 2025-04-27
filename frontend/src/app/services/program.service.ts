@@ -8,6 +8,9 @@ import { ServiceResponse, Program } from '../interfaces/assist.doc.interfaces';
   providedIn: 'root'
 })
 export class ProgramService {
+  getPrograms() {
+    throw new Error('Method not implemented.');
+  }
 
   API_URL: string = 'http://localhost:3000/programs/';
 

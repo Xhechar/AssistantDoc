@@ -147,11 +147,11 @@
 
             <div class="enrollment-actions">
                 <button *ngIf="enrollment.Status === 'Pending'" class="action-btn complete"
-                    (click)="updateStatus(enrollment.EnrollmentId, 'Completed')" title="Mark as Completed">
+                    (click)="updateStatus(enrollment.EnrollmentId)" title="Mark as Completed">
                     <i class="bx bx-check"></i>
                 </button>
                 <button *ngIf="enrollment.Status === 'Completed'" class="action-btn redo"
-                    (click)="updateStatus(enrollment.EnrollmentId, 'Pending')" title="Mark as Pending">
+                    (click)="updateStatus(enrollment.EnrollmentId)" title="Mark as Pending">
                     <i class="bx bx-revision"></i>
                 </button>
                 <button class="action-btn delete" (click)="openDeleteModal(enrollment)" title="Delete Enrollment">

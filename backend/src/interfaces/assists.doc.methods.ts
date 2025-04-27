@@ -28,7 +28,7 @@ export interface IPatientService {
 
 export interface IEnrollmentService {
   prisma: PrismaClient;
-  enrollPatient(dto: EnrollPatientDto, userId: string): Promise<ServiceResponse<void>>;
+  enrollPatient(dtos: EnrollPatientDto[], userId: string): Promise<ServiceResponse<void>>;
   toggleEnrollmentStatus(id: string): Promise<ServiceResponse<null>>;
   deleteEnrollment(enrollmentId: string): Promise<ServiceResponse<void>>;
   getEnrollmentById(enrollmentId: string, userId: string): Promise<ServiceResponse<Enrollment>>;

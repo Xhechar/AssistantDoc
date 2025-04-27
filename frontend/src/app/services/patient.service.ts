@@ -43,8 +43,8 @@ export class PatientService {
     );
   }
 
-  getAllPatients(): Observable<ServiceResponse<Patient[]>> {
-    return this.http.get<ServiceResponse<Patient[]>>(
+  getAllPatients(): Observable<ServiceResponse<Patient>> {
+    return this.http.get<ServiceResponse<Patient>>(
       `${this.API_URL}getAllPatients`,
       { withCredentials: true }
     );

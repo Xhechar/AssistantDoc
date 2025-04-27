@@ -1,3 +1,4 @@
+<app-notification></app-notification>
 <div class="signup-container">
     <div class="signup-content">
         <div class="signup-info">
@@ -32,7 +33,7 @@
                 <h3>Create Account</h3>
             </div>
 
-            <form #signUp="ngForm" (ngSubmit)="onSubmit(signUp.value)" novalidate>
+            <form #signUp="ngForm" (ngSubmit)="onSubmit()" novalidate>
                 <!-- Full Name -->
                 <div class="form-group">
                     <label for="fullName">Full Name</label>

@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Patient } from '../../../interfaces/assist.doc.interfaces';
+import { NotificationType, Patient } from '../../../interfaces/assist.doc.interfaces';
 import { CommonModule } from '@angular/common';
+import { NotificationService } from '../../../services/modal/notification.service';
+import { PatientService } from '../../../services/patient.service';
+import { RegisterPatientDto, UpdatePatientDto } from '../../../interfaces/assist.doc.dtos';
 
 @Component({
   selector: 'app-patients',
@@ -39,107 +42,52 @@ export class PatientsComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private patientService: PatientService,
+    private ns: NotificationService
   ) {
     this.patientForm = this.fb.group({
-      PatientId: [''],
       FullName: ['', Validators.required],
       Email: ['', Validators.email],
       Phone: [''],
       DateOfBirth: [''],
-      NationalId: [''],
-      DateCreated: [new Date()]
+      NationalId: ['']
     });
   }
 
   ngOnInit(): void {
-    this.loadDummyData();
+    this.loadPatients();
     this.applyFilters();
   }
 
-  // Load dummy data for demonstration
-  loadDummyData(): void {
-    const now = new Date();
-    const yesterday = new Date(now);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const lastWeek = new Date(now);
-    lastWeek.setDate(lastWeek.getDate() - 7);
-    const lastMonth = new Date(now);
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-    
-    this.patients = [
-      {
-        PatientId: '1',
-        FullName: 'John Doe',
-        Email: 'john.doe@example.com',
-        Phone: '+1234567890',
-        DateOfBirth: new Date(1985, 5, 15),
-        NationalId: 'ABC123456',
-        DateCreated: now,
-        Enrollments: [
-          {
-            EnrollmentId: '101',
-            PatientId: '1',
-            ProgramId: 'P1',
-            DateCreated: now,
-            Status: 'Active'
-          },
-          {
-            EnrollmentId: '102',
-            PatientId: '1',
-            ProgramId: 'P2',
-            DateCreated: yesterday,
-            Status: 'Active'
-          }
-        ]
+  // Load patients from API
+  loadPatients(): void {
+    this.patientService.getAllPatients().subscribe({
+      next: (response) => {
+        if (response.success && response.objects) {
+          this.patients = response.objects;
+          this.applyFilters();
+          this.ns.showAlert({
+            notificationType: NotificationType.Success,
+            message: 'Patients loaded successfully',
+            title: 'Success'
+          });
+        } else {
+          this.ns.showAlert({
+            notificationType: NotificationType.Warning,
+            message: response.message,
+            title: response.error as string
+          });
+        }
       },
-      {
-        PatientId: '2',
-        FullName: 'Jane Smith',
-        Email: 'jane.smith@example.com',
-        Phone: '+1987654321',
-        DateOfBirth: new Date(1990, 8, 21),
-        NationalId: 'DEF789012',
-        DateCreated: yesterday,
-        Enrollments: [
-          {
-            EnrollmentId: '103',
-            PatientId: '2',
-            ProgramId: 'P3',
-            DateCreated: lastWeek,
-            Status: 'Active'
-          }
-        ]
-      },
-      {
-        PatientId: '3',
-        FullName: 'Robert Johnson',
-        Email: 'robert.johnson@example.com',
-        Phone: '+1122334455',
-        DateOfBirth: new Date(1978, 3, 10),
-        NationalId: 'GHI345678',
-        DateCreated: lastWeek,
-        Enrollments: []
-      },
-      {
-        PatientId: '4',
-        FullName: 'Maria Garcia',
-        Email: 'maria.garcia@example.com',
-        Phone: '+1555666777',
-        DateOfBirth: new Date(1995, 11, 5),
-        NationalId: 'JKL901234',
-        DateCreated: lastMonth,
-        Enrollments: [
-          {
-            EnrollmentId: '104',
-            PatientId: '4',
-            ProgramId: 'P1',
-            DateCreated: lastMonth,
-            Status: 'Completed'
-          }
-        ]
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message as string || 'Failed to load patients',
+          title: 'Error'
+        });
       }
-    ];
+    });
   }
 
   // CRUD Operations
@@ -175,31 +123,76 @@ export class PatientsComponent implements OnInit {
 
   savePatient(): void {
     if (this.patientForm.invalid) {
+      this.ns.showAlert({
+        notificationType: NotificationType.Warning,
+        message: 'Please fill in all required fields correctly',
+        title: 'Invalid Form'
+      });
       return;
     }
     
-    const patientData: Patient = this.patientForm.value;
+    const patientData: UpdatePatientDto = this.patientForm.value;
+    const createPatient: RegisterPatientDto = this.patientForm.value;
     
     if (this.isEditMode && this.selectedPatient) {
       // Update existing patient
-      const index = this.patients.findIndex(p => p.PatientId === patientData.PatientId);
-      if (index !== -1) {
-        // Preserve enrollments from existing patient
-        patientData.Enrollments = this.patients[index].Enrollments;
-        this.patients[index] = patientData;
-        this.showToast('Patient updated successfully');
-      }
+      this.patientService.updatePatient(this.selectedPatient.PatientId, patientData).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.loadPatients();
+            this.closePatientForm();
+            this.applyFilters();
+            this.ns.showAlert({
+              notificationType: NotificationType.Success,
+              message: 'Patient updated successfully',
+              title: 'Success'
+            });
+          } else {
+            this.ns.showAlert({
+              notificationType: NotificationType.Warning,
+              message: response.message,
+              title: response.error as string
+            });
+          }
+        },
+        error: (error) => {
+          this.ns.showAlert({
+            notificationType: NotificationType.Error,
+            message: error.error.message as string || 'Failed to update patient',
+            title: 'Error'
+          });
+        }
+      });
     } else {
       // Create new patient
-      patientData.PatientId = this.generateId();
-      patientData.DateCreated = new Date();
-      patientData.Enrollments = [];
-      this.patients.unshift(patientData);
-      this.showToast('Patient added successfully');
+      this.patientService.registerPatient(createPatient).subscribe({
+        next: (response) => {
+          if (response.success && response.object) {
+            this.patients.unshift(response.object);
+            this.closePatientForm();
+            this.applyFilters();
+            this.ns.showAlert({
+              notificationType: NotificationType.Success,
+              message: 'Patient added successfully',
+              title: 'Success'
+            });
+          } else {
+            this.ns.showAlert({
+              notificationType: NotificationType.Warning,
+              message: response.message,
+              title: response.error as string
+            });
+          }
+        },
+        error: (error) => {
+          this.ns.showAlert({
+            notificationType: NotificationType.Error,
+            message: error.error.message as string || 'Failed to add patient',
+            title: 'Error'
+          });
+        }
+      });
     }
-    
-    this.closePatientForm();
-    this.applyFilters();
   }
 
   confirmDelete(patient: Patient): void {
@@ -214,10 +207,34 @@ export class PatientsComponent implements OnInit {
 
   deletePatient(): void {
     if (this.patientToDelete) {
-      this.patients = this.patients.filter(p => p.PatientId !== this.patientToDelete?.PatientId);
-      this.showToast('Patient deleted successfully');
-      this.cancelDelete();
-      this.applyFilters();
+      const patientId = this.patientToDelete.PatientId;
+      this.patientService.deletePatient(patientId).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.patients = this.patients.filter(p => p.PatientId !== patientId);
+            this.cancelDelete();
+            this.applyFilters();
+            this.ns.showAlert({
+              notificationType: NotificationType.Success,
+              message: 'Patient deleted successfully',
+              title: 'Success'
+            });
+          } else {
+            this.ns.showAlert({
+              notificationType: NotificationType.Warning,
+              message: response.message,
+              title: response.error as string
+            });
+          }
+        },
+        error: (error) => {
+          this.ns.showAlert({
+            notificationType: NotificationType.Error,
+            message: error.error.message as string || 'Failed to delete patient',
+            title: 'Error'
+          });
+        }
+      });
     }
   }
 
@@ -240,7 +257,11 @@ export class PatientsComponent implements OnInit {
   copyShareLink(input: HTMLInputElement): void {
     input.select();
     document.execCommand('copy');
-    this.showToast('Link copied to clipboard');
+    this.ns.showAlert({
+      notificationType: NotificationType.Success,
+      message: 'Link copied to clipboard',
+      title: 'Success'
+    });
   }
 
   // Pagination
@@ -315,29 +336,5 @@ export class PatientsComponent implements OnInit {
       const activeEnrollments = patient.Enrollments?.filter(e => e.Status === 'Active') || [];
       return count + activeEnrollments.length;
     }, 0);
-  }
-
-  showToast(message: string): void {
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.innerHTML = `
-      <i class="bx bx-check-circle"></i>
-      <span>${message}</span>
-    `;
-    document.body.appendChild(toast);
-    
-    // Show toast
-    setTimeout(() => {
-      toast.classList.add('show');
-    }, 100);
-    
-    // Hide and remove toast
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => {
-        document.body.removeChild(toast);
-      }, 300);
-    }, 3000);
   }
 }

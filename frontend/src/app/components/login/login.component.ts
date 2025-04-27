@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit {
           if (response.role == 'Doctor') {
             setTimeout(() => {
                 router.navigate(['/doctor']);
-              }, 4000);
+              }, 5500);
           }          
         } else {
             ns.showAlert({notificationType: NotificationType.Warning, message: response.message, title: response.error as string});

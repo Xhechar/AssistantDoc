@@ -29,16 +29,16 @@ export class UserService {
     );
   }
 
-  getUserById(userId: string): Observable<ServiceResponse<User>> {
+  getUserById(): Observable<ServiceResponse<User>> {
     return this.http.get<ServiceResponse<User>>(
-      `${this.API_URL}getUserById/${userId}`,
+      `${this.API_URL}getUserById`,
       { withCredentials: true }
     );
   }
 
-  updateUser(userId: string, updatedDetails: UpdateUserDto): Observable<ServiceResponse<null>> {
+  updateUser(updatedDetails: UpdateUserDto): Observable<ServiceResponse<null>> {
     return this.http.put<ServiceResponse<null>>(
-      `${this.API_URL}updateUser/${userId}`,
+      `${this.API_URL}updateUser`,
       updatedDetails,
       { withCredentials: true }
     );

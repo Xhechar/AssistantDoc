@@ -1,3 +1,4 @@
+<app-notification></app-notification>
 <div class="profile-container">
     <!-- Profile Header with Quick Stats -->
     <div class="profile-header">
@@ -299,17 +300,5 @@
                 <button class="btn-primary" (click)="confirmAction()">Confirm</button>
             </div>
         </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast" [class.show]="showToast" [class.success]="toastType === 'success'"
-        [class.error]="toastType === 'error'">
-        <div class="toast-icon">
-            <i [class]="toastType === 'success' ? 'fa fa-check-circle' : 'fa fa-exclamation-circle'"></i>
-        </div>
-        <div class="toast-message">{{toastMessage}}</div>
-        <button class="toast-close" (click)="closeToast()">
-            <i class="fa fa-times"></i>
-        </button>
     </div>
 </div>

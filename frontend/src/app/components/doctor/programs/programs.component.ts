@@ -1,12 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { Program, Patient, User, Enrollment } from '../../../interfaces/assist.doc.interfaces';
+import { Program, Patient, User, Enrollment, NotificationType } from '../../../interfaces/assist.doc.interfaces';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { EnrollmentService } from '../../../services/enrollment.service';
+import { NotificationService } from '../../../services/modal/notification.service';
+import { PatientService } from '../../../services/patient.service';
+import { ProgramService } from '../../../services/program.service';
+import { EnrollPatientDto, UpdateEnrollmentDto, UpdateProgramDto } from '../../../interfaces/assist.doc.dtos';
+import { NotificationComponent } from "../../notification/notification.component";
 
 @Component({
   selector: 'app-programs',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NotificationComponent],
   templateUrl: './programs.component.html',
   styleUrl: './programs.component.css'
 })
@@ -33,148 +39,73 @@ export class ProgramsComponent implements OnInit {
   selectedPatients: Patient[] = [];
   patientSearchTerm: string = '';
 
-  constructor() { }
+  constructor(
+    private programService: ProgramService,
+    private patientService: PatientService,
+    private enrollmentService: EnrollmentService,
+    private ns: NotificationService
+  ) { }
 
   ngOnInit(): void {
-    this.loadDummyData();
-    this.filteredPrograms = [...this.programs];
+    this.loadData();
   }
 
-  // Load dummy data for demonstration
-  loadDummyData(): void {
-    // Dummy users
-    const users: User[] = [
-      {
-        UserId: 'user-1',
-        FullName: 'John Doe',
-        Email: 'john@example.com',
-        Phone: '+1234567890',
-        Password: 'password',
-        Role: 'Admin',
-        IsWelcomed: true,
-        DateCreated: new Date('2023-01-10')
+  // Load programs and patients from API
+  loadData(): void {
+    // Load programs
+    this.programService.getAllPrograms().subscribe({
+      next: (response) => {
+        if (response.success && response.objects) {
+          this.programs = response.objects;
+          this.filteredPrograms = [...this.programs];
+          // this.ns.showAlert({
+          //   notificationType: NotificationType.Success,
+          //   message: 'Programs loaded successfully',
+          //   title: 'Success'
+          // });
+        } else {
+          this.ns.showAlert({
+            notificationType: NotificationType.Warning,
+            message: response.message,
+            title: response.error as string
+          });
+        }
       },
-      {
-        UserId: 'user-2',
-        FullName: 'Jane Smith',
-        Email: 'jane@example.com',
-        Phone: '+1987654321',
-        Password: 'password',
-        Role: 'Doctor',
-        IsWelcomed: true,
-        DateCreated: new Date('2023-02-15')
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message as string || 'Failed to load programs',
+          title: 'Error'
+        });
       }
-    ];
+    });
 
-    // Dummy patients
-    this.patients = [
-      {
-        PatientId: 'patient-1',
-        FullName: 'Alice Johnson',
-        Phone: '+1122334455',
-        Email: 'alice@example.com',
-        DateOfBirth: new Date('1985-05-15'),
-        NationalId: 'NAT123456',
-        DateCreated: new Date('2023-03-01')
+    // Load patients
+    this.patientService.getAllPatients().subscribe({
+      next: (response) => {
+        if (response.success && response.objects) {
+          this.patients = response.objects;
+          // this.ns.showAlert({
+          //   notificationType: NotificationType.Success,
+          //   message: 'Patients loaded successfully',
+          //   title: 'Success'
+          // });
+        } else {
+          this.ns.showAlert({
+            notificationType: NotificationType.Warning,
+            message: response.message,
+            title: response.error as string
+          });
+        }
       },
-      {
-        PatientId: 'patient-2',
-        FullName: 'Bob Williams',
-        Phone: '+1567890123',
-        Email: 'bob@example.com',
-        DateOfBirth: new Date('1992-08-23'),
-        NationalId: 'NAT789012',
-        DateCreated: new Date('2023-03-05')
-      },
-      {
-        PatientId: 'patient-3',
-        FullName: 'Carol Davis',
-        Phone: '+1345678901',
-        Email: 'carol@example.com',
-        DateOfBirth: new Date('1978-12-10'),
-        NationalId: 'NAT345678',
-        DateCreated: new Date('2023-03-10')
-      },
-      {
-        PatientId: 'patient-4',
-        FullName: 'David Miller',
-        Phone: '+1890123456',
-        Email: 'david@example.com',
-        DateOfBirth: new Date('1990-04-05'),
-        NationalId: 'NAT901234',
-        DateCreated: new Date('2023-03-15')
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message as string || 'Failed to load patients',
+          title: 'Error'
+        });
       }
-    ];
-
-    // Dummy enrollments
-    const enrollments: Enrollment[] = [
-      {
-        EnrollmentId: 'enroll-1',
-        PatientId: 'patient-1',
-        ProgramId: 'program-1',
-        EnrolledByUserId: 'user-1',
-        DateCreated: new Date('2023-04-05'),
-        Status: 'Active',
-        Patient: this.patients[0]
-      },
-      {
-        EnrollmentId: 'enroll-2',
-        PatientId: 'patient-2',
-        ProgramId: 'program-1',
-        EnrolledByUserId: 'user-1',
-        DateCreated: new Date('2023-04-06'),
-        Status: 'Active',
-        Patient: this.patients[1]
-      },
-      {
-        EnrollmentId: 'enroll-3',
-        PatientId: 'patient-3',
-        ProgramId: 'program-2',
-        EnrolledByUserId: 'user-2',
-        DateCreated: new Date('2023-04-10'),
-        Status: 'Active',
-        Patient: this.patients[2]
-      }
-    ];
-
-    // Dummy programs
-    this.programs = [
-      {
-        ProgramId: 'program-1',
-        ProgramName: 'Diabetes Management',
-        Description: 'Comprehensive program for managing diabetes and improving quality of life for patients with type 1 and type 2 diabetes.',
-        DateCreated: new Date('2023-03-20'),
-        DateModified: new Date('2023-03-20'),
-        CreatedByUserId: 'user-1',
-        CreatedBy: users[0],
-        Enrollments: [enrollments[0], enrollments[1]]
-      },
-      {
-        ProgramId: 'program-2',
-        ProgramName: 'Hypertension Control',
-        Description: 'Program designed to help patients monitor and control high blood pressure through medication management and lifestyle changes.',
-        DateCreated: new Date('2023-03-25'),
-        DateModified: new Date('2023-03-25'),
-        CreatedByUserId: 'user-2',
-        CreatedBy: users[1],
-        Enrollments: [enrollments[2]]
-      },
-      {
-        ProgramId: 'program-3',
-        ProgramName: 'Maternal Health',
-        Description: 'Support program for expectant mothers with regular check-ups and guidance throughout pregnancy.',
-        DateCreated: new Date('2023-04-01'),
-        DateModified: new Date('2023-04-01'),
-        CreatedByUserId: 'user-1',
-        CreatedBy: users[0],
-        Enrollments: []
-      }
-    ];
-
-    // Link enrollments to programs
-    enrollments[0].Program = this.programs[0];
-    enrollments[1].Program = this.programs[0];
-    enrollments[2].Program = this.programs[1];
+    });
   }
 
   // Filter programs based on search term
@@ -228,29 +159,78 @@ export class ProgramsComponent implements OnInit {
   }
 
   saveProgram(): void {
-    if (this.isEditMode) {
-      // Update existing program
-      const index = this.programs.findIndex(p => p.ProgramId === this.currentProgram.ProgramId);
-      if (index !== -1) {
-        this.currentProgram.DateModified = new Date();
-        this.programs[index] = { ...this.currentProgram };
-      }
-    } else {
-      // Add new program
-      const newProgram: Program = {
-        ...this.currentProgram,
-        ProgramId: 'program-' + (this.programs.length + 1),
-        DateCreated: new Date(),
-        DateModified: new Date(),
-        CreatedByUserId: 'user-1', // Assuming current user is user-1
-        Enrollments: []
-      };
-      this.programs.push(newProgram);
+    if (!this.currentProgram.ProgramName.trim()) {
+      this.ns.showAlert({
+        notificationType: NotificationType.Warning,
+        message: 'Program name is required',
+        title: 'Invalid Input'
+      });
+      return;
     }
 
-    this.filterPrograms();
-    this.closeProgramForm();
-  }
+    if (this.isEditMode) {
+      // Update existing program
+      this.programService.updateProgram(this.currentProgram.ProgramId, {ProgramName: this.currentProgram.ProgramName, Description: this.currentProgram.Description}).subscribe({
+        next: (response) => {
+          if (response.success && response.object) {
+            const index = this.programs.findIndex(p => p.ProgramId === this.currentProgram.ProgramId);
+            if (index !== -1) {
+              this.programs[index] = response.object;
+              this.filterPrograms();
+              this.closeProgramForm();
+              this.ns.showAlert({
+                notificationType: NotificationType.Success,
+                message: 'Program updated successfully',
+                title: 'Success'
+              });
+            }
+          } else {
+            this.ns.showAlert({
+              notificationType: NotificationType.Warning,
+              message: response.message,
+              title: response.error as string
+            });
+          }
+        },
+        error: (error) => {
+          this.ns.showAlert({
+            notificationType: NotificationType.Error,
+            message: error.error.message as string || 'Failed to update program',
+            title: 'Error'
+          });
+        }
+      });
+    } else {
+      // Add new program
+      this.programService.createProgram(this.currentProgram).subscribe({
+        next: (response) => {
+          if (response.success && response.object) {
+            this.programs.push(response.object);
+            this.filterPrograms();
+            this.closeProgramForm();
+            this.ns.showAlert({
+              notificationType: NotificationType.Success,
+              message: 'Program created successfully',
+              title: 'Success'
+              });
+            } else {
+              this.ns.showAlert({
+                notificationType: NotificationType.Warning,
+                message: response.message,
+                title: response.error as string
+              });
+            }
+          },
+          error: (error) => {
+            this.ns.showAlert({
+              notificationType: NotificationType.Error,
+              message: error.error.message as string || 'Failed to create program',
+              title: 'Error'
+            });
+          }
+        });
+      }
+    }
 
   // Delete operations
   openDeleteModal(program: Program): void {
@@ -265,9 +245,34 @@ export class ProgramsComponent implements OnInit {
 
   deleteProgram(): void {
     if (this.programToDelete) {
-      this.programs = this.programs.filter(p => p.ProgramId !== this.programToDelete!.ProgramId);
-      this.filterPrograms();
-      this.closeDeleteModal();
+      const programId = this.programToDelete.ProgramId;
+      this.programService.deleteProgram(programId).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.programs = this.programs.filter(p => p.ProgramId !== programId);
+            this.filterPrograms();
+            this.closeDeleteModal();
+            this.ns.showAlert({
+              notificationType: NotificationType.Success,
+              message: 'Program deleted successfully',
+              title: 'Success'
+            });
+          } else {
+            this.ns.showAlert({
+              notificationType: NotificationType.Warning,
+              message: response.message,
+              title: response.error as string
+            });
+          }
+        },
+        error: (error) => {
+          this.ns.showAlert({
+            notificationType: NotificationType.Error,
+            message: error.error.message as string || 'Failed to delete program',
+            title: 'Error'
+          });
+        }
+      });
     }
   }
 
@@ -324,27 +329,54 @@ export class ProgramsComponent implements OnInit {
 
   enrollPatients(): void {
     if (this.programToEnroll && this.selectedPatients.length > 0) {
-      // Create new enrollments
-      for (const patient of this.selectedPatients) {
-        const newEnrollment: Enrollment = {
-          EnrollmentId: `enroll-${Date.now()}-${patient.PatientId}`,
-          PatientId: patient.PatientId,
-          ProgramId: this.programToEnroll.ProgramId,
-          EnrolledByUserId: 'user-1', // Assuming current user is user-1
-          DateCreated: new Date(),
-          Status: 'Active',
-          Patient: patient,
-          Program: this.programToEnroll
-        };
+      const enrollments = this.selectedPatients.map(patient => ({
+        PatientId: patient.PatientId,
+        ProgramId: this.programToEnroll!.ProgramId
+      }));
 
-        // Add to program enrollments
-        if (!this.programToEnroll.Enrollments) {
-          this.programToEnroll.Enrollments = [];
-        }
-        this.programToEnroll.Enrollments.push(newEnrollment);
+      let objs: EnrollPatientDto[] = [];
+
+      for (const enrollment of enrollments) {
+        objs.push( {
+          PatientId: enrollment.PatientId,
+          ProgramId: enrollment.ProgramId,
+          EnrolledByUserId: ''
+        });
       }
 
-      this.closeEnrollModal();
+      this.enrollmentService.enrollPatient(objs).subscribe({
+        next: (response) => {
+          if (response.success && response.objects) {
+            const index = this.programs.findIndex(p => p.ProgramId === this.programToEnroll!.ProgramId);
+            this.loadData();
+            this.closeEnrollModal();
+            this.ns.showAlert({
+              notificationType: NotificationType.Success,
+              message: `${this.selectedPatients.length} patient(s) enrolled successfully`,
+              title: 'Success'
+            });
+          } else {
+            this.ns.showAlert({
+              notificationType: NotificationType.Warning,
+              message: response.message,
+              title: response.error as string
+            });
+          }
+        },
+        error: (error) => {
+          this.ns.showAlert({
+            notificationType: NotificationType.Error,
+            message: error.error.message as string || 'Failed to enroll patients',
+            title: 'Error'
+          });
+        }
+      });
+    } else {
+      this.ns.showAlert({
+        notificationType: NotificationType.Warning,
+        message: 'No patients selected for enrollment',
+        title: 'Warning'
+      });
     }
   }
 

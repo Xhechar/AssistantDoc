@@ -11,37 +11,53 @@ export class EnrollmentService implements IEnrollmentService {
         log: ['error']
     });
 
-    async enrollPatient(dto: EnrollPatientDto): Promise<ServiceResponse<void>> {
-        let patientExists = await this.prisma.patient.findUnique({
-            where: { PatientId: dto.PatientId }
-        });
-
-        if (!patientExists) {
-            return FormattedResponse.failure('patient not found.', 'Patient Erro');
-        }
-
-        let programExists = await this.prisma.program.findUnique({
-            where: { ProgramId: dto.ProgramId }
-        });
-
-        if (!programExists) {
-            return FormattedResponse.failure('program not found.', 'Program Erro');
-        }
-
-        const createEnrollment = await this.prisma.enrollment.create({
-            data: {
-                EnrollmentId: v4(),
-                PatientId: patientExists.PatientId,
-                ProgramId: programExists.ProgramId,
-                EnrolledByUserId: dto.EnrolledByUserId
+    async enrollPatient(dtos: EnrollPatientDto[], userId: string): Promise<ServiceResponse<void>> {
+        let userExists = await this.prisma.user.findUnique({
+            where: {
+                UserId: userId
             }
         });
 
-        if (!createEnrollment) {
-            return FormattedResponse.failure('Enrollment creation failed.', 'Enrollment Error');
+        if (!userExists) {
+            return FormattedResponse.failure('Access not authorised.', 'User not found');
         }
 
-        return FormattedResponse.success('Patient enrolled successfully.');
+        let patientsExists = await this.prisma.patient.findMany();
+
+        if (!patientsExists) {
+            return FormattedResponse.failure('patients not found.', 'Patient Error');
+        }
+
+        let programExists = await this.prisma.program.findUnique({
+            where: { ProgramId: dtos[0].ProgramId }
+        });
+
+        if (!programExists) {
+            return FormattedResponse.failure('program not found.', 'Program Error');
+        }
+
+        let count: number = 0;
+
+        for (let dto of dtos) {
+            const createEnrollment = await this.prisma.enrollment.createMany({
+                data: {
+                    EnrollmentId: v4(),
+                    PatientId: dto.PatientId,
+                    ProgramId: programExists.ProgramId,
+                    EnrolledByUserId: userId
+                }
+            });
+
+            if(createEnrollment) {
+                count++;
+            }
+        }
+
+        if (dtos.length > 0 && count === 0) {
+            return FormattedResponse.failure('Enrollments creation failed.', 'Enrollment Error');
+        }
+
+        return FormattedResponse.success('Patient(s) enrolled successfully.');
     }
 
     async toggleEnrollmentStatus(id: string): Promise<ServiceResponse<null>> {

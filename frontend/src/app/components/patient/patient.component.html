@@ -78,41 +78,25 @@
         <div class="tab-content">
             <!-- Enrollments Tab -->
             <div *ngIf="activeTab === 'enrollments'" class="enrollments-tab">
-                <div class="no-data" *ngIf="!patient?.Enrollments || patient.Enrollments.length === 0">
+                <div class="no-data" *ngIf="!patient?.Enrollments || (patient?.Enrollments || []).length === 0">
                     <i class="bx bx-info-circle"></i>
                     <p>No enrollments found for this patient.</p>
                 </div>
 
-                <div class="enrollment-list" *ngIf="patient?.Enrollments && patient.Enrollments.length > 0">
-                    <div class="enrollment-card" *ngFor="let enrollment of patient.Enrollments">
-                        <div class="enrollment-status" [class]="enrollment.Status.toLowerCase()">
-                            {{ enrollment.Status }}
+                <div class="enrollment-list" *ngIf="(patient?.Enrollments || []).length > 0">   
+                    <div class="enrollment-card" *ngFor="let enrollment of patient?.Enrollments">
+                        <div class="enrollment-status" [class]="enrollment?.Status?.toLowerCase()">
+                            {{ enrollment?.Status }}
                         </div>
                         <div class="enrollment-details">
-                            <h3>{{ enrollment.Program?.ProgramName }}</h3>
-                            <p *ngIf="enrollment.Program?.Description">{{ enrollment.Program?.Description }}</p>
+                            <h3>{{ enrollment?.Program?.ProgramName }}</h3>
+                            <p *ngIf="enrollment?.Program?.Description">{{ enrollment?.Program?.Description }}</p>
                             <div class="enrollment-meta">
-                                <span><i class="fas fa-calendar"></i> Enrolled: {{ enrollment.DateCreated |
+                                <span><i class="fas fa-calendar"></i> Enrolled: {{ enrollment?.DateCreated |
                                     date:'mediumDate' }}</span>
-                                <span *ngIf="enrollment.EnrolledBy"><i class="fas fa-user"></i> By: {{
-                                    enrollment.EnrolledBy?.FullName }}</span>
+                                <span *ngIf="enrollment?.EnrolledBy"><i class="fas fa-user"></i> By: {{
+                                    enrollment?.EnrolledBy?.FullName }}</span>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Timeline Tab -->
-            <div *ngIf="activeTab === 'timeline'" class="timeline-tab">
-                <div class="timeline">
-                    <div class="timeline-item" *ngFor="let event of timelineEvents">
-                        <div class="timeline-icon" [class]="event.type">
-                            <i [class]="event.icon"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <h3>{{ event.title }}</h3>
-                            <p>{{ event.description }}</p>
-                            <span class="timeline-date">{{ event.date | date:'medium' }}</span>
                         </div>
                     </div>
                 </div>

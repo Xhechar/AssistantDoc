@@ -1,8 +1,12 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Patient, Program, Enrollment } from '../../../interfaces/assist.doc.interfaces';
+import { Patient, Program, Enrollment, NotificationType, ServiceResponse } from '../../../interfaces/assist.doc.interfaces';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { EnrollmentService } from '../../../services/enrollment.service';
+import { NotificationService } from '../../../services/modal/notification.service';
+import { PatientService } from '../../../services/patient.service';
+import { ProgramService } from '../../../services/program.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,10 +17,10 @@ import { FormsModule } from '@angular/forms';
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
   // Stats counters
-  totalPatients: number = 257;
-  totalPrograms: number = 8;
-  totalEnrollments: number = 423;
-  totalUsers: number = 24;
+  totalPatients: number = 0;
+  totalPrograms: number = 0;
+  totalEnrollments: number = 0;
+  totalUsers: number = 0;
   
   // Growth percentages
   patientGrowth: number = 12.5;
@@ -30,301 +34,121 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   // Animation flag
   newPatientsToday: boolean = true;
   
-  // Dummy data for recent patients
-  recentPatients: Patient[] = [
-    {
-      PatientId: 'PAT-54321ab',
-      FullName: 'Jane Smith',
-      Phone: '+254712345678',
-      Email: 'jane.smith@example.com',
-      DateOfBirth: new Date('1990-05-15'),
-      NationalId: 'ID12345678',
-      DateCreated: new Date('2025-04-12'),
-      Enrollments: [
-        {
-          EnrollmentId: 'ENR-111222',
-          PatientId: 'PAT-54321ab',
-          ProgramId: 'PRG-hiv001',
-          DateCreated: new Date('2025-04-12'),
-          Status: 'Active',
-          EnrolledByUserId: 'USR-001'
-        },
-        {
-          EnrollmentId: 'ENR-111223',
-          PatientId: 'PAT-54321ab',
-          ProgramId: 'PRG-tb001',
-          DateCreated: new Date('2025-04-12'),
-          Status: 'Active',
-          EnrolledByUserId: 'USR-001'
-        }
-      ]
-    },
-    {
-      PatientId: 'PAT-12345cd',
-      FullName: 'John Doe',
-      Phone: '+254723456789',
-      Email: 'john.doe@example.com',
-      DateOfBirth: new Date('1985-10-20'),
-      NationalId: 'ID87654321',
-      DateCreated: new Date('2025-04-15'),
-      Enrollments: [
-        {
-          EnrollmentId: 'ENR-333444',
-          PatientId: 'PAT-12345cd',
-          ProgramId: 'PRG-diabetes',
-          DateCreated: new Date('2025-04-15'),
-          Status: 'Active',
-          EnrolledByUserId: 'USR-001'
-        }
-      ]
-    },
-    {
-      PatientId: 'PAT-67890ef',
-      FullName: 'Sarah Johnson',
-      Phone: '+254734567890',
-      Email: 'sarah.j@example.com',
-      DateOfBirth: new Date('1995-12-03'),
-      NationalId: 'ID23456789',
-      DateCreated: new Date('2025-04-18'),
-      Enrollments: []
-    },
-    {
-      PatientId: 'PAT-09876gh',
-      FullName: 'Michael Brown',
-      Phone: '+254745678901',
-      Email: 'michael.b@example.com',
-      DateOfBirth: new Date('1978-07-22'),
-      NationalId: 'ID34567890',
-      DateCreated: new Date('2025-04-20'),
-      Enrollments: [
-        {
-          EnrollmentId: 'ENR-555666',
-          PatientId: 'PAT-09876gh',
-          ProgramId: 'PRG-hiv001',
-          DateCreated: new Date('2025-04-20'),
-          Status: 'Pending',
-          EnrolledByUserId: 'USR-002'
-        }
-      ]
-    },
-    {
-      PatientId: 'PAT-24680ij',
-      FullName: 'Elizabeth Wilson',
-      Phone: '+254756789012',
-      Email: 'elizabeth.w@example.com',
-      DateOfBirth: new Date('1992-04-17'),
-      NationalId: 'ID45678901',
-      DateCreated: new Date('2025-04-24'),
-      Enrollments: [
-        {
-          EnrollmentId: 'ENR-777888',
-          PatientId: 'PAT-24680ij',
-          ProgramId: 'PRG-malaria',
-          DateCreated: new Date('2025-04-24'),
-          Status: 'Active',
-          EnrolledByUserId: 'USR-001'
-        },
-        {
-          EnrollmentId: 'ENR-777889',
-          PatientId: 'PAT-24680ij',
-          ProgramId: 'PRG-nutrition',
-          DateCreated: new Date('2025-04-25'),
-          Status: 'Active',
-          EnrolledByUserId: 'USR-003'
-        }
-      ]
-    }
-  ];
-  
-  // Dummy data for active programs
-  activePrograms: Program[] = [
-    {
-      ProgramId: 'PRG-hiv001',
-      ProgramName: 'HIV/AIDS Treatment',
-      Description: 'Comprehensive program for HIV/AIDS patients including ARV therapy and regular checkups.',
-      DateCreated: new Date('2024-12-10'),
-      DateModified: new Date('2025-03-15'),
-      CreatedByUserId: 'USR-001',
-      Enrollments: Array(56).fill(null)
-    },
-    {
-      ProgramId: 'PRG-tb001',
-      ProgramName: 'Tuberculosis Control',
-      Description: 'TB diagnosis, treatment, and follow-up program for affected patients.',
-      DateCreated: new Date('2025-01-05'),
-      DateModified: new Date('2025-03-20'),
-      CreatedByUserId: 'USR-002',
-      Enrollments: Array(42).fill(null)
-    },
-    {
-      ProgramId: 'PRG-malaria',
-      ProgramName: 'Malaria Prevention',
-      Description: 'Prevention, diagnosis and treatment of malaria with follow-up care.',
-      DateCreated: new Date('2025-02-15'),
-      DateModified: new Date('2025-04-01'),
-      CreatedByUserId: 'USR-001',
-      Enrollments: Array(78).fill(null)
-    },
-    {
-      ProgramId: 'PRG-diabetes',
-      ProgramName: 'Diabetes Management',
-      Description: 'Program for diabetes diagnosis, treatment, and lifestyle management.',
-      DateCreated: new Date('2025-03-10'),
-      DateModified: new Date('2025-04-10'),
-      CreatedByUserId: 'USR-003',
-      Enrollments: Array(31).fill(null)
-    }
-  ];
-  
-  // Dummy data for recent enrollments with populated objects
-  recentEnrollments: Enrollment[] = [
-    {
-      EnrollmentId: 'ENR-777888',
-      PatientId: 'PAT-24680ij',
-      ProgramId: 'PRG-malaria',
-      EnrolledByUserId: 'USR-001',
-      DateCreated: new Date('2025-04-24'),
-      Status: 'Active',
-      Patient: {
-        PatientId: 'PAT-24680ij',
-        FullName: 'Elizabeth Wilson',
-        Phone: '+254756789012',
-        Email: 'elizabeth.w@example.com',
-        DateOfBirth: new Date('1992-04-17'),
-        NationalId: 'ID45678901',
-        DateCreated: new Date('2025-04-24')
-      },
-      Program: {
-        ProgramId: 'PRG-malaria',
-        ProgramName: 'Malaria Prevention',
-        Description: 'Prevention, diagnosis and treatment of malaria with follow-up care.',
-        DateCreated: new Date('2025-02-15'),
-        DateModified: new Date('2025-04-01')
-      },
-      EnrolledBy: {
-        UserId: 'USR-001',
-        FullName: 'Dr. James Wilson',
-        Email: 'james.wilson@assistantdoc.com',
-        Phone: '+254700123456',
-        Password: '',
-        Role: 'Doctor',
-        IsWelcomed: true,
-        DateCreated: new Date('2024-10-15')
-      }
-    },
-    {
-      EnrollmentId: 'ENR-777889',
-      PatientId: 'PAT-24680ij',
-      ProgramId: 'PRG-nutrition',
-      EnrolledByUserId: 'USR-003',
-      DateCreated: new Date('2025-04-25'),
-      Status: 'Active',
-      Patient: {
-        PatientId: 'PAT-24680ij',
-        FullName: 'Elizabeth Wilson',
-        Phone: '+254756789012',
-        Email: 'elizabeth.w@example.com',
-        DateOfBirth: new Date('1992-04-17'),
-        NationalId: 'ID45678901',
-        DateCreated: new Date('2025-04-24')
-      },
-      Program: {
-        ProgramId: 'PRG-nutrition',
-        ProgramName: 'Nutrition Support',
-        Description: 'Program for addressing malnutrition and dietary guidance.',
-        DateCreated: new Date('2025-01-20'),
-        DateModified: new Date('2025-03-12')
-      },
-      EnrolledBy: {
-        UserId: 'USR-003',
-        FullName: 'Dr. Sarah Johnson',
-        Email: 'sarah.johnson@assistantdoc.com',
-        Phone: '+254711234567',
-        Password: '',
-        Role: 'Nutritionist',
-        IsWelcomed: true,
-        DateCreated: new Date('2024-11-05')
-      }
-    },
-    {
-      EnrollmentId: 'ENR-555666',
-      PatientId: 'PAT-09876gh',
-      ProgramId: 'PRG-hiv001',
-      EnrolledByUserId: 'USR-002',
-      DateCreated: new Date('2025-04-20'),
-      Status: 'Pending',
-      Patient: {
-        PatientId: 'PAT-09876gh',
-        FullName: 'Michael Brown',
-        Phone: '+254745678901',
-        Email: 'michael.b@example.com',
-        DateOfBirth: new Date('1978-07-22'),
-        NationalId: 'ID34567890',
-        DateCreated: new Date('2025-04-20')
-      },
-      Program: {
-        ProgramId: 'PRG-hiv001',
-        ProgramName: 'HIV/AIDS Treatment',
-        Description: 'Comprehensive program for HIV/AIDS patients including ARV therapy and regular checkups.',
-        DateCreated: new Date('2024-12-10'),
-        DateModified: new Date('2025-03-15')
-      },
-      EnrolledBy: {
-        UserId: 'USR-002',
-        FullName: 'Dr. Emily Parker',
-        Email: 'emily.parker@assistantdoc.com',
-        Phone: '+254722345678',
-        Password: '',
-        Role: 'Doctor',
-        IsWelcomed: true,
-        DateCreated: new Date('2024-10-25')
-      }
-    },
-    {
-      EnrollmentId: 'ENR-333444',
-      PatientId: 'PAT-12345cd',
-      ProgramId: 'PRG-diabetes',
-      EnrolledByUserId: 'USR-001',
-      DateCreated: new Date('2025-04-15'),
-      Status: 'Active',
-      Patient: {
-        PatientId: 'PAT-12345cd',
-        FullName: 'John Doe',
-        Phone: '+254723456789',
-        Email: 'john.doe@example.com',
-        DateOfBirth: new Date('1985-10-20'),
-        NationalId: 'ID87654321',
-        DateCreated: new Date('2025-04-15')
-      },
-      Program: {
-        ProgramId: 'PRG-diabetes',
-        ProgramName: 'Diabetes Management',
-        Description: 'Program for diabetes diagnosis, treatment, and lifestyle management.',
-        DateCreated: new Date('2025-03-10'),
-        DateModified: new Date('2025-04-10')
-      },
-      EnrolledBy: {
-        UserId: 'USR-001',
-        FullName: 'Dr. James Wilson',
-        Email: 'james.wilson@assistantdoc.com',
-        Phone: '+254700123456',
-        Password: '',
-        Role: 'Doctor',
-        IsWelcomed: true,
-        DateCreated: new Date('2024-10-15')
-      }
-    }
-  ];
+  // Data arrays to be populated from API
+  recentPatients: Patient[] = [];
+  activePrograms: Program[] = [];
+  recentEnrollments: Enrollment[] = [];
 
-  constructor(private router: Router) {}
+  API_URL: string = 'http://localhost:3000/';
+  
+  constructor(
+    private router: Router,
+    private enrollmentService: EnrollmentService,
+    private patientService: PatientService,
+    private programService: ProgramService,
+    private ns: NotificationService
+  ) {}
 
   ngOnInit(): void {
-    // Any initialization code
+    this.fetchRecentPatients();
+    this.fetchActivePrograms();
+    this.fetchRecentEnrollments();
   }
 
   ngAfterViewInit(): void {
     //
   }
+
+  // Fetch recent patients
+  private fetchRecentPatients(): void {
+    this.patientService.getAllPatients().subscribe({
+      next: (response) => {
+        if (response.success && response.objects) {
+          this.recentPatients = response.objects;
+          this.totalPatients = this.recentPatients.length;
+          this.ns.showAlert({
+            notificationType: NotificationType.Success,
+            message: 'Recent patients loaded successfully',
+            title: 'Success'
+          });
+        } else {
+          this.ns.showAlert({
+            notificationType: NotificationType.Warning,
+            message: response.message,
+            title: response.error as string
+          });
+        }
+      },
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message as string || 'Failed to fetch recent patients',
+          title: 'Error'
+        });
+      }
+    });
+  }
+
+  // Fetch active programs
+  private fetchActivePrograms(): void {
+    this.programService.getAllPrograms().subscribe({
+      next: (response) => {
+        if (response.success && response.objects) {
+          this.activePrograms = response.objects;
+          this.totalPrograms = this.activePrograms.length;
+          this.ns.showAlert({
+            notificationType: NotificationType.Success,
+            message: 'Active programs loaded successfully',
+            title: 'Success'
+          });
+        } else {
+          this.ns.showAlert({
+            notificationType: NotificationType.Warning,
+            message: response.message,
+            title: response.error as string
+          });
+        }
+      },
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message as string || 'Failed to fetch active programs',
+          title: 'Error'
+        });
+      }
+    });
+  }
+
+  // Fetch recent enrollments
+  private fetchRecentEnrollments(): void {
+    this.enrollmentService.getAllEnrollments().subscribe({
+      next: (response) => {
+        if (response.success && response.objects) {
+          this.recentEnrollments = response.objects;
+          this.totalEnrollments = this.recentEnrollments.length;
+          this.ns.showAlert({
+            notificationType: NotificationType.Success,
+            message: 'Recent enrollments loaded successfully',
+            title: 'Success'
+          });
+        } else {
+          this.ns.showAlert({
+            notificationType: NotificationType.Warning,
+            message: response.message,
+            title: response.error as string
+          });
+        }
+      },
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message as string || 'Failed to fetch recent enrollments',
+          title: 'Error'
+        });
+      }
+    });
+  }
+
   // Get patient age from date of birth
   getPatientAge(dob?: Date): number {
     if (!dob) return 0;
@@ -349,9 +173,48 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   // Search patients
   searchPatients(event: Event): void {
-    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
-    // Implement search logic here
-    console.log('Searching for:', searchTerm);
+    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase().trim();
+    
+    try {
+      if (!searchTerm) {
+        this.recentPatients = [...this.recentPatients];
+        this.ns.showAlert({
+          notificationType: NotificationType.Success,
+          message: `Displaying all ${this.recentPatients.length} patients`,
+          title: 'Search Reset'
+        });
+        return;
+      }
+
+      const filteredPatients = this.recentPatients.filter(patient =>
+        patient.FullName?.toLowerCase().includes(searchTerm) ||
+        patient.Email?.toLowerCase().includes(searchTerm) ||
+        patient.Phone?.toLowerCase().includes(searchTerm) ||
+        patient.NationalId?.toLowerCase().includes(searchTerm)
+      );
+
+      this.recentPatients = filteredPatients;
+
+      if (filteredPatients.length > 0) {
+        this.ns.showAlert({
+          notificationType: NotificationType.Success,
+          message: `Found ${filteredPatients.length} patients matching search`,
+          title: 'Search Success'
+        });
+      } else {
+        this.ns.showAlert({
+          notificationType: NotificationType.Warning,
+          message: 'No patients found matching your search',
+          title: 'No Results'
+        });
+      }
+    } catch (error) {
+      this.ns.showAlert({
+        notificationType: NotificationType.Error,
+        message: (error instanceof Error) ? error.message : 'Failed to search patients',
+        title: 'Search Error'
+      });
+    }
   }
 
   // View patient details

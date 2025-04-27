@@ -8,15 +8,18 @@ import { ServiceResponse, Enrollment } from '../interfaces/assist.doc.interfaces
   providedIn: 'root'
 })
 export class EnrollmentService {
+  getEnrollments() {
+    throw new Error('Method not implemented.');
+  }
 
   API_URL: string = 'http://localhost:3000/enrollments/';
 
   constructor(private http: HttpClient) { }
 
-  enrollPatient(details: EnrollPatientDto): Observable<ServiceResponse<Enrollment>> {
-    return this.http.post<ServiceResponse<Enrollment>>(
+  enrollPatient(dtos: EnrollPatientDto[]): Observable<ServiceResponse<null>> {
+    return this.http.post<ServiceResponse<null>>(
       `${this.API_URL}enrollPatient`,
-      details,
+      {dtos},
       { withCredentials: true }
     );
   }
