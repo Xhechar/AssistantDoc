@@ -61,6 +61,18 @@ export const registerPatientSchema = Joi.object({
     .optional()
     .messages({
       'string.email': 'Email must be a valid email address.'
+    }),
+  NationalId: Joi.string()
+    .optional()
+    .allow(null, '')
+    .messages({
+      'string.base': 'National ID must be text.'
+    }),
+  DateOfBirth: Joi.date()
+    .optional()
+    .allow(null, '')
+    .messages({
+      'date.base': 'Date of birth must be a valid date.'
     })
 });
 
@@ -85,7 +97,19 @@ export const updatePatientSchema = Joi.object({
     .optional()
     .messages({
       'string.email': 'Email must be a valid email address.'
-    })
+    }),
+    NationalId: Joi.string()
+      .optional()
+      .allow(null, '')
+      .messages({
+        'string.base': 'National ID must be text.'
+      }),
+    DateOfBirth: Joi.date()
+      .optional()
+      .allow(null, '')
+      .messages({
+        'date.base': 'Date of birth must be a valid date.'
+      })
 });
 
 //enrollment

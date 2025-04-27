@@ -27,7 +27,7 @@ export class UserController {
                     httpOnly: true,
                     secure: false,
                     sameSite: 'strict',
-                    maxAge: 15 * 60 * 1000,
+                    maxAge: 45 * 60 * 1000,
                     signed: true
                 });
 

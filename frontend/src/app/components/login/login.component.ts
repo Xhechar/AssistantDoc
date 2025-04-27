@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
           });
 
           if (response.role == 'Doctor') {
-            setTimeout(() => {
+              setTimeout(() => {
                 router.navigate(['/doctor']);
               }, 5500);
           }          
@@ -54,7 +54,7 @@ export class LoginComponent implements OnInit {
           }
       },
         error: (error) => {
-          this.ns.showAlert({notificationType: NotificationType.Error, message: error.message as string, title: error.error as string});
+          this.ns.showAlert({notificationType: NotificationType.Error, message: error.error.message, title: error.error.error as string});
         }
     })
   }

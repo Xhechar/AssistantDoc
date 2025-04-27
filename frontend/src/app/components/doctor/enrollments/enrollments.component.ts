@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EnrollmentService } from '../../../services/enrollment.service';
 import { NotificationService } from '../../../services/modal/notification.service';
+import { NotificationComponent } from "../../notification/notification.component";
 
 @Component({
   selector: 'app-enrollments',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NotificationComponent],
   templateUrl: './enrollments.component.html',
   styleUrl: './enrollments.component.css'
 })
@@ -53,7 +54,7 @@ export class EnrollmentsComponent implements OnInit {
           this.applyFilters();
           this.ns.showAlert({
             notificationType: NotificationType.Success,
-            message: 'Enrollments loaded successfully',
+            message: response.message,
             title: 'Success'
           });
         } else {
@@ -68,7 +69,7 @@ export class EnrollmentsComponent implements OnInit {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
           message: error.error.message as string || 'Failed to load enrollments',
-          title: 'Error'
+          title: error.error.error as string
         });
       }
     });
@@ -192,17 +193,13 @@ export class EnrollmentsComponent implements OnInit {
   updateStatus(enrollmentId: string): void {
     this.enrollmentService.toggleEnrollmentStatus(enrollmentId).subscribe({
       next: (response) => {
-        if (response.success && response.object) {
-          const index = this.enrollments.findIndex(e => e.EnrollmentId === enrollmentId);
-          if (index !== -1) {
-            this.enrollments[index] = response.object;
-            this.applyFilters();
-            this.ns.showAlert({
-              notificationType: NotificationType.Success,
-              message: response.message,
-              title: 'Success'
-            });
-          }
+        if (response.success) {
+          this.loadEnrollments();this.applyFilters();
+          this.ns.showAlert({
+            notificationType: NotificationType.Success,
+            message: response.message,
+            title: 'Success'
+          });
         } else {
           this.ns.showAlert({
             notificationType: NotificationType.Warning,
@@ -215,7 +212,7 @@ export class EnrollmentsComponent implements OnInit {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
           message: error.error.message as string || 'Failed to update enrollment status',
-          title: 'Error'
+          title: error.error.error as string
         });
       }
     });
@@ -258,7 +255,7 @@ export class EnrollmentsComponent implements OnInit {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
             message: error.error.message as string || 'Failed to delete enrollment',
-            title: 'Error'
+            title: error.error.error as string
           });
         }
       });

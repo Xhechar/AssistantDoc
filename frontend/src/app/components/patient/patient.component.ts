@@ -16,7 +16,7 @@ import { PatientService } from '../../services/patient.service';
 })
 export class PatientComponent implements OnInit {
   // Patient data
-  patient: Patient | null = null;
+  patient!: Patient;
   editPatient: Patient = {} as Patient;
   
   // UI State
@@ -34,7 +34,7 @@ export class PatientComponent implements OnInit {
     private patientService: PatientService,
     private ns: NotificationService
   ) { 
-    const patientId = this.route.snapshot.paramMap.get('id');
+    const patientId = this.route.snapshot.paramMap.get('PatientId');
     if (patientId) {
       this.patientId = patientId;
     } else {
@@ -47,9 +47,7 @@ export class PatientComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.patientId) {
-      this.loadPatient(this.patientId);
-    }
+    this.loadPatient(this.patientId);
   }
 
   // Load patient data from API
@@ -61,7 +59,7 @@ export class PatientComponent implements OnInit {
           this.editPatient = { ...this.patient };
           this.ns.showAlert({
             notificationType: NotificationType.Success,
-            message: 'Patient data loaded successfully',
+            message: response.message,
             title: 'Success'
           });
         } else {
@@ -76,7 +74,7 @@ export class PatientComponent implements OnInit {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
           message: error.error.message as string || 'Failed to load patient data',
-          title: 'Error'
+          title: error.error.error as string
         });
       }
     });

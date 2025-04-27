@@ -136,7 +136,8 @@ export class ProgramService implements IProgramService {
                 UserId: userId
             },
             include: {
-                Enrollments: true
+                Enrollments: true,
+                ProgramsCreated: true
             }
         });
 

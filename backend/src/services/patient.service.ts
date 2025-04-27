@@ -2,7 +2,7 @@ import { PrismaClient, Patient } from "@prisma/client";
 import { RegisterPatientDto, UpdatePatientDto } from "../interfaces/assist.doc.dtos";
 import { ServiceResponse } from "../interfaces/assist.doc.interfaces";
 import { IPatientService } from "../interfaces/assists.doc.methods";
-import { registerUserSchema, updatePatientSchema } from "../validators/req.body.validators";
+import { registerPatientSchema, registerUserSchema, updatePatientSchema } from "../validators/req.body.validators";
 import { FormattedResponse } from "../interfaces/helper/service.response";
 import { v4 } from "uuid";
 
@@ -24,7 +24,7 @@ export class PatientService implements IPatientService {
             return FormattedResponse.failure('User not found.', 'User not found');
         }
         
-        let {error} = registerUserSchema.validate(dto);
+        let {error} = registerPatientSchema.validate(dto);
 
         if(error) {
             return FormattedResponse.failure(error.details[0].message, 'Validation error');
@@ -64,7 +64,8 @@ export class PatientService implements IPatientService {
             data: {
                 PatientId: v4(),
                 CreatedByUserId: userExists.UserId,
-                ...dto
+                ...dto,
+                DateOfBirth: dto.DateOfBirth ? new Date(dto.DateOfBirth) : null,
             }
         });
 
@@ -103,43 +104,14 @@ export class PatientService implements IPatientService {
             return FormattedResponse.failure(error.details[0].message, 'Validation error');
         }
 
-        let emailExists = await this.prisma.patient.findUnique({
-            where: {
-                Email: dto.Email
-            }
-        });
-
-        if(emailExists) {
-            return FormattedResponse.failure('The email provided exists, only update.', 'Email already exists');
-        }
-
-        let phoneExists = await this.prisma.patient.findUnique({
-            where: {
-                Phone: dto.Phone
-            }
-        });
-
-        if(phoneExists) {
-            return FormattedResponse.failure('The phone number provided exists, only update.', 'Phone number already exists');
-        }
-
-        let nationalIdExists = await this.prisma.patient.findUnique({
-            where: {
-                NationalId: dto.NationalId
-            }
-        });
-
-        if(nationalIdExists) {
-            return FormattedResponse.failure('The national ID provided exists, only update.', 'National ID already exists');
-        }
-
         let updatePatient = await this.prisma.patient.update({
             where: {
                 PatientId: patientId
             },
             data: {
                 CreatedByUserId: userExists.UserId,
-                ...dto
+                ...dto,
+                DateOfBirth: dto.DateOfBirth ? new Date(dto.DateOfBirth) : null,
             }
         });
 

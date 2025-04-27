@@ -48,7 +48,7 @@ export class SignupComponent implements OnInit {
           this.ns.showAlert({
             notificationType: NotificationType.Success,
             message: response.message,
-            title: undefined
+            title: 'Success'
           });
           setTimeout(() => {
             window.location.href = '/login';
@@ -64,8 +64,8 @@ export class SignupComponent implements OnInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.error as string,
-          title: 'Internal Server Error'
+          message: error.error.message as string,
+          title: error.error.error as string
         });
       }
     });

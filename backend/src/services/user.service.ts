@@ -89,7 +89,7 @@ export class UserService implements IUserService {
         let { Password, FullName, Email, Phone, IsWelcomed, DateCreated, ...rest } = userExists;
 
         let token = jwt.sign({ ...rest }, process.env.JWT_SECRET as string, {
-            expiresIn: '15m'
+            expiresIn: '45m'
         });
 
         return FormattedResponse.auth(token, userExists.Role as string);

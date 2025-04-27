@@ -11,20 +11,20 @@
     <div class="profile-header">
         <div class="profile-avatar">
             <div class="avatar-container">
-                <span>{{ getInitials(patient?.FullName) }}</span>
+                <span>{{ getInitials(patient.FullName) }}</span>
             </div>
         </div>
         <div class="profile-info">
-            <h1>{{ patient?.FullName || 'Patient Name' }}</h1>
+            <h1>{{ patient.FullName || 'Patient Name' }}</h1>
             <div class="patient-id">
-                <span><i class="fas fa-id-card"></i> Patient ID: {{ patient?.PatientId }}</span>
+                <span><i class="fas fa-id-card"></i> Patient ID: {{ patient.PatientId }}</span>
             </div>
             <div class="patient-basic-info">
-                <span *ngIf="patient?.DateOfBirth"><i class="fas fa-birthday-cake"></i> {{ patient?.DateOfBirth |
+                <span *ngIf="patient?.DateOfBirth"><i class="fas fa-birthday-cake"></i> {{ patient.DateOfBirth |
                     date:'mediumDate' }}</span>
-                <span *ngIf="patient?.Email"><i class="fas fa-envelope"></i> {{ patient?.Email }}</span>
-                <span *ngIf="patient?.Phone"><i class="fas fa-phone"></i> {{ patient?.Phone }}</span>
-                <span *ngIf="patient?.NationalId"><i class="fas fa-passport"></i> ID: {{ patient?.NationalId }}</span>
+                <span *ngIf="patient?.Email"><i class="fas fa-envelope"></i> {{ patient.Email }}</span>
+                <span *ngIf="patient?.Phone"><i class="fas fa-phone"></i> {{ patient.Phone }}</span>
+                <span *ngIf="patient?.NationalId"><i class="fas fa-passport"></i> ID: {{ patient.NationalId }}</span>
             </div>
         </div>
     </div>

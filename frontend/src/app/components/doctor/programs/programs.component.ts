@@ -21,6 +21,8 @@ export class ProgramsComponent implements OnInit {
   programs: Program[] = [];
   filteredPrograms: Program[] = [];
   searchTerm: string = '';
+  enrollments: number = 0;
+  recentPrograms: number = 0;
 
   // Modal states
   showProgramForm: boolean = false;
@@ -51,6 +53,7 @@ export class ProgramsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+    this.enrollments = this.getTotalEnrollments();
   }
 
   // Load programs and patients from API
@@ -77,8 +80,8 @@ export class ProgramsComponent implements OnInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.message || 'Failed to load programs',
-          title: error.error as string
+          message: error.error.message || 'Failed to load programs',
+          title: error.error.error as string
         });
       }
     });
@@ -104,8 +107,8 @@ export class ProgramsComponent implements OnInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.message as string || 'Failed to load patients',
-          title: error.error as string
+          message: error.error.message as string || 'Failed to load patients',
+          title: error.error.error as string
         });
       }
     });
@@ -174,6 +177,8 @@ export class ProgramsComponent implements OnInit {
     
 
     if (this.isEditMode) {
+      console.log(this.currentProgramId, this.currentProgram);
+      
       this.programService.updateProgram(this.currentProgramId, {ProgramName: this.currentProgram.ProgramName, Description: this.currentProgram.Description}).subscribe({
         next: (response) => {
           if (response.success) {
@@ -199,14 +204,14 @@ export class ProgramsComponent implements OnInit {
           this.currentProgramId = '';
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.message as string || 'Failed to update program',
-            title: error.error as string
+            message: error.error.message as string || 'Failed to update program',
+            title: error.error.error as string
           });
         }
       });
     } else {
       // Add new program
-      this.programService.createProgram(this.currentProgram).subscribe({
+      this.programService.createProgram({ProgramName: this.currentProgram.ProgramName, Description: this.currentProgram.Description}).subscribe({
         next: (response) => {
           if (response.success) {
             this.loadData();
@@ -228,8 +233,8 @@ export class ProgramsComponent implements OnInit {
           error: (error) => {
             this.ns.showAlert({
               notificationType: NotificationType.Error,
-              message: error.message as string || 'Failed to create program',
-              title: error.error as string
+              message: error.error.message as string || 'Failed to create program',
+              title: error.error.error as string
             });
           }
         });
@@ -272,8 +277,8 @@ export class ProgramsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.message as string || 'Failed to delete program',
-            title: error.error as string
+            message: error.error.message as string || 'Failed to delete program',
+            title: error.error.error as string
           });
         }
       });
@@ -370,8 +375,8 @@ export class ProgramsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.message as string || 'Failed to enroll patients',
-            title: error.error as string
+            message: error.error.message as string || 'Failed to enroll patients',
+            title: error.error.error as string
           });
         }
       });
@@ -396,8 +401,28 @@ export class ProgramsComponent implements OnInit {
   }
 
   getTotalEnrollments(): number {
-    return this.programs.reduce((total, program) => 
-      total + (program.Enrollments ? program.Enrollments.length : 0), 0);
+    let count = 0;
+    this.enrollmentService.getAllEnrollments().subscribe({
+      next: (response) => {
+        if (response.success && response.object) {
+          count = (response.object as unknown as Enrollment[]).length;
+        } else {
+          this.ns.showAlert({
+            notificationType: NotificationType.Warning,
+            message: response.message,
+            title: response.error as string
+          });
+        }
+      },
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message || 'Failed to load enrollments',
+          title: error.error.error as string
+        });
+      }
+    });
+    return count;
   }
 
   getRecentProgramsCount(): number {

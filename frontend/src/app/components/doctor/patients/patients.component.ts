@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../services/modal/notification.service';
 import { PatientService } from '../../../services/patient.service';
 import { RegisterPatientDto, UpdatePatientDto } from '../../../interfaces/assist.doc.dtos';
+import { NotificationComponent } from "../../notification/notification.component";
 
 @Component({
   selector: 'app-patients',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NotificationComponent],
   templateUrl: './patients.component.html',
   styleUrl: './patients.component.css'
 })
@@ -83,8 +84,8 @@ export class PatientsComponent implements OnInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.message as string || 'Failed to load patients',
-          title: error.error as string
+          message: error.error.message as string || 'Failed to load patients',
+          title: error.error.error as string
         });
       }
     });
@@ -158,22 +159,21 @@ export class PatientsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.message as string || 'Failed to update patient',
-            title: error.error as string
+            message: error.error.message as string || 'Failed to update patient',
+            title: error.error.error as string
           });
         }
       });
     } else {
-      // Create new patient
       this.patientService.registerPatient(createPatient).subscribe({
         next: (response) => {
-          if (response.success && response.object) {
-            this.patients.unshift(response.object);
+          if (response.success) {
+            this.loadPatients();
             this.closePatientForm();
             this.applyFilters();
             this.ns.showAlert({
               notificationType: NotificationType.Success,
-              message: 'Patient added successfully',
+              message: response.message,
               title: 'Success'
             });
           } else {
@@ -187,8 +187,8 @@ export class PatientsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.message as string || 'Failed to add patient',
-            title: error.error as string
+            message: error.error.message as string || 'Failed to add patient',
+            title: error.error.error as string
           });
         }
       });
@@ -216,7 +216,7 @@ export class PatientsComponent implements OnInit {
             this.applyFilters();
             this.ns.showAlert({
               notificationType: NotificationType.Success,
-              message: 'Patient deleted successfully',
+              message: response.message,
               title: 'Success'
             });
           } else {
@@ -230,8 +230,8 @@ export class PatientsComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.message as string || 'Failed to delete patient',
-            title: error.error as string
+            message: error.error.message as string || 'Failed to delete patient',
+            title: error.error.error as string
           });
         }
       });
