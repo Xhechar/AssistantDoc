@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
 
-  API_URL: string = 'https://Assistant_Doc_Backend.onrender.com/user/';
+  API_URL: string = 'https://Assistant-Doc-Backend.onrender.com/user/';
 
   constructor(private http: HttpClient) { }
 
