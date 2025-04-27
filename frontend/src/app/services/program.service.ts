@@ -12,7 +12,7 @@ export class ProgramService {
     throw new Error('Method not implemented.');
   }
 
-  API_URL: string = 'https://Assistant-Doc-Backend.onrender.com/programs/';
+  API_URL: string = 'https://assistant-doc-backend.onrender.com/programs/';
 
   constructor(private http: HttpClient) { }
 
