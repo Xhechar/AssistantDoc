@@ -9,7 +9,7 @@ import { ServiceResponse, Patient } from '../interfaces/assist.doc.interfaces';
 })
 export class PatientService {
 
-  API_URL: string = 'http://localhost:3000/patients/';
+  API_URL: string = 'https://Assistant_Doc_Backend.onrender.com/patients/';
 
   constructor(private http: HttpClient) { }
 

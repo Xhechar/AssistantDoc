@@ -12,7 +12,7 @@ export class EnrollmentService {
     throw new Error('Method not implemented.');
   }
 
-  API_URL: string = 'http://localhost:3000/enrollments/';
+  API_URL: string = 'https://Assistant_Doc_Backend.onrender.com/enrollments/';
 
   constructor(private http: HttpClient) { }
 
