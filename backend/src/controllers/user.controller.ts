@@ -25,8 +25,8 @@ export class UserController {
             if (result.success) {
                 res.cookie('token', result.token as string, {
                     httpOnly: true,
-                    secure: false,
-                    sameSite: 'strict',
+                    secure: true,
+                    sameSite: 'none',
                     maxAge: 45 * 60 * 1000,
                     signed: true
                 });
