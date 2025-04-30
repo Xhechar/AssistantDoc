@@ -12,7 +12,7 @@ dotenv.config();
 
 app.use(Express.json());
 app.use(Cors({
-    origin: ["https://assistant-doctor.onrender.com", "http://localhost:4200"],
+    origin: "https://assistant-doctor.onrender.com",
     credentials: true
 }));
 app.use(cookieParser(process.env.COOKIE_SECRET as string));
