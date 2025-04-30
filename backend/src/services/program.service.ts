@@ -148,6 +148,10 @@ export class ProgramService implements IProgramService {
         let programs = await this.prisma.program.findMany({
             where: {
                 CreatedByUserId: userId
+            },
+            include: {
+                CreatedBy: true,
+                Enrollments: true
             }
         });
 

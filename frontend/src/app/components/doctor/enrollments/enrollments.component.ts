@@ -194,7 +194,7 @@ export class EnrollmentsComponent implements OnInit {
     this.enrollmentService.toggleEnrollmentStatus(enrollmentId).subscribe({
       next: (response) => {
         if (response.success) {
-          this.loadEnrollments();this.applyFilters();
+          this.loadEnrollments(); this.applyFilters();
           this.ns.showAlert({
             notificationType: NotificationType.Success,
             message: response.message,

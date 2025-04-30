@@ -53,11 +53,11 @@ export class EnrollmentService implements IEnrollmentService {
             }
         }
 
-        if (dtos.length > 0 && count === 0) {
+        if (count === 0) {
             return FormattedResponse.failure('Enrollments creation failed.', 'Enrollment Error');
+        } else {
+            return FormattedResponse.success('Patient(s) enrolled successfully.');
         }
-
-        return FormattedResponse.success('Patient(s) enrolled successfully.');
     }
 
     async toggleEnrollmentStatus(id: string): Promise<ServiceResponse<null>> {
@@ -150,7 +150,7 @@ export class EnrollmentService implements IEnrollmentService {
         });
 
         if (!enrollments || enrollments.length === 0) {
-            return FormattedResponse.failure('No enrollments found for this patient.', 'Enrollments Error');
+            return FormattedResponse.failure('No enrollments found.', 'Enrollments Error');
         }
 
         return FormattedResponse.success<Enrollment[]>('Patient enrollments retrieved successfully.', enrollments);

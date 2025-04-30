@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Enrollment, NotificationType, Patient, Program, User } from '../../../interfaces/assist.doc.interfaces';
+import { Enrollment, NotificationType, User } from '../../../interfaces/assist.doc.interfaces';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../services/modal/notification.service';
 import { UserService } from '../../../services/user.service';
 import { NotificationComponent } from "../../notification/notification.component";
+import { UpdateUserDto } from '../../../interfaces/assist.doc.dtos';
 
 @Component({
   selector: 'app-profile',
@@ -71,7 +72,7 @@ export class ProfileComponent implements OnInit {
           this.loadUserSettings();
           this.ns.showAlert({
             notificationType: NotificationType.Success,
-            message: 'User profile loaded successfully',
+            message: response.message,
             title: 'Success'
           });
         } else {
@@ -85,8 +86,8 @@ export class ProfileComponent implements OnInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.error.message as string || 'Failed to load user profile',
-          title: 'Error'
+          message: error.error.message as string,
+          title: error.error.error as string
         });
       }
     });
@@ -169,7 +170,7 @@ export class ProfileComponent implements OnInit {
   editProfile(): void {
     this.setActiveTab('settings');
     this.ns.showAlert({
-      notificationType: NotificationType.Success,
+      notificationType: NotificationType.Info,
       message: 'Edit your profile information',
       title: 'Profile Edit'
     });
@@ -190,7 +191,7 @@ export class ProfileComponent implements OnInit {
           };
           this.ns.showAlert({
             notificationType: NotificationType.Success,
-            message: 'User settings loaded successfully',
+            message: response.message,
             title: 'Success'
           });
         } else {
@@ -205,7 +206,7 @@ export class ProfileComponent implements OnInit {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
           message: error.error.message as string || 'Failed to load user settings',
-          title: 'Error'
+          title: error.error.error as string
         });
       }
     });
@@ -215,7 +216,7 @@ export class ProfileComponent implements OnInit {
   resetForm(): void {
     this.loadUserSettings();
     this.ns.showAlert({
-      notificationType: NotificationType.Success,
+      notificationType: NotificationType.Info,
       message: 'Changes discarded',
       title: 'Success'
     });
@@ -228,7 +229,16 @@ export class ProfileComponent implements OnInit {
       this.ns.showAlert({
         notificationType: NotificationType.Error,
         message: 'Passwords do not match',
-        title: 'Error'
+        title: 'Credentials Error'
+      });
+      return;
+    }
+
+    if (this.settingsForm.password == ''.trim()) {
+      this.ns.showAlert({
+        notificationType: NotificationType.Info,
+        message: 'Password not provided.',
+        title: 'Credentials Error'
       });
       return;
     }
@@ -236,15 +246,11 @@ export class ProfileComponent implements OnInit {
     this.confirmationModalTitle = 'Save Changes';
     this.confirmationModalMessage = 'Are you sure you want to save these changes to your profile?';
     this.pendingAction = () => {
-      const updatedUser: Partial<User> = {
+      const updatedUser: UpdateUserDto = {
         FullName: this.settingsForm.fullName,
         Email: this.settingsForm.email,
-        Phone: this.settingsForm.phone,
-        Role: this.settingsForm.role
+        Phone: this.settingsForm.phone
       };
-      if (this.settingsForm.password) {
-        updatedUser.Password = this.settingsForm.password;
-      }
       
       this.userService.updateUser(updatedUser).subscribe({
         next: (response) => {
@@ -253,7 +259,7 @@ export class ProfileComponent implements OnInit {
             this.loadUserSettings();
             this.ns.showAlert({
               notificationType: NotificationType.Success,
-              message: 'Profile updated successfully',
+              message: response.message,
               title: 'Success'
             });
           } else {
@@ -267,8 +273,8 @@ export class ProfileComponent implements OnInit {
         error: (error) => {
           this.ns.showAlert({
             notificationType: NotificationType.Error,
-            message: error.error.message as string || 'Failed to update profile',
-            title: 'Error'
+            message: error.error.message as string,
+            title: error.error.error as string
           });
         }
       });

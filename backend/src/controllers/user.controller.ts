@@ -46,7 +46,7 @@ export class UserController {
         try {
             res.clearCookie('token', { signed: true });
 
-            return res.status(200).json(FormattedResponse.success('Logout successful, you are always welcomed'));
+            return res.status(200).json(FormattedResponse.success('Logout successful, you are always welcomed.'));
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown server error';
             return res.status(500).json(FormattedResponse.failure(message, 'Server Error'));

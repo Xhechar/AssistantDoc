@@ -53,7 +53,7 @@ export class ProgramsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
-    this.enrollments = this.getTotalEnrollments();
+    this.loadEnrolments();
   }
 
   // Load programs and patients from API
@@ -63,6 +63,8 @@ export class ProgramsComponent implements OnInit {
       next: (response) => {
         if (response.success && response.object) {
           this.programs = response.object as unknown as Program[];
+          
+          this.recentPrograms = this.getRecentProgramsCount();
           this.filteredPrograms = [...this.programs];
           // this.ns.showAlert({
           //   notificationType: NotificationType.Success,
@@ -108,6 +110,34 @@ export class ProgramsComponent implements OnInit {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
           message: error.error.message as string || 'Failed to load patients',
+          title: error.error.error as string
+        });
+      }
+    });
+  }
+
+  loadEnrolments() {
+    this.enrollmentService.getAllEnrollments().subscribe({
+      next: (response) => {
+        if (response.success && response.object) {
+          this.enrollments = (response.object as unknown as Enrollment[]).length;
+          // this.ns.showAlert({
+          //   notificationType: NotificationType.Success,
+          //   message: 'Patients loaded successfully',
+          //   title: 'Success'
+          // });
+        } else {
+          // this.ns.showAlert({
+          //   notificationType: NotificationType.Warning,
+          //   message: response.message,
+          //   title: response.error as string
+          // });
+        }
+      },
+      error: (error) => {
+        this.ns.showAlert({
+          notificationType: NotificationType.Error,
+          message: error.error.message as string,
           title: error.error.error as string
         });
       }
@@ -398,31 +428,6 @@ export class ProgramsComponent implements OnInit {
       DateCreated: new Date(),
       DateModified: new Date()
     };
-  }
-
-  getTotalEnrollments(): number {
-    let count = 0;
-    this.enrollmentService.getAllEnrollments().subscribe({
-      next: (response) => {
-        if (response.success && response.object) {
-          count = (response.object as unknown as Enrollment[]).length;
-        } else {
-          this.ns.showAlert({
-            notificationType: NotificationType.Warning,
-            message: response.message,
-            title: response.error as string
-          });
-        }
-      },
-      error: (error) => {
-        this.ns.showAlert({
-          notificationType: NotificationType.Error,
-          message: error.error.message || 'Failed to load enrollments',
-          title: error.error.error as string
-        });
-      }
-    });
-    return count;
   }
 
   getRecentProgramsCount(): number {

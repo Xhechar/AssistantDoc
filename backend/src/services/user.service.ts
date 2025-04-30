@@ -5,9 +5,10 @@ import { IUserService } from "../interfaces/assists.doc.methods";
 import { FormattedResponse } from "../interfaces/helper/service.response";
 import { v4 } from "uuid";
 import bcrypt from "bcrypt";
-import { loginUserSchema, registerUserSchema } from "../validators/req.body.validators";
+import { loginUserSchema, registerUserSchema, updateUserSchema } from "../validators/req.body.validators";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
+import { not } from "joi";
 
 dotenv.config();
 
@@ -112,7 +113,7 @@ export class UserService implements IUserService {
         return FormattedResponse.success<User>('User found.', userExists);
     }
     async updateUser(userId: string, dto: UpdateUserDto): Promise<ServiceResponse<void>> {
-        let {error} = registerUserSchema.validate(dto);
+        let {error} = updateUserSchema.validate(dto);
 
         if (error) {
             return FormattedResponse.failure(error.details[0].message, 'Validation error');

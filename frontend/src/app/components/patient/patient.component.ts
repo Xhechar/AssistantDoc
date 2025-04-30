@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
-import { Patient, User, Program, Enrollment, NotificationType } from '../../interfaces/assist.doc.interfaces';
+import { Patient, NotificationType } from '../../interfaces/assist.doc.interfaces';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NotificationService } from '../../services/modal/notification.service';
 import { PatientService } from '../../services/patient.service';
+import { NotificationComponent } from "../notification/notification.component";
 
 @Component({
   selector: 'app-patient',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NotificationComponent],
   templateUrl: './patient.component.html',
   styleUrl: './patient.component.css'
 })
@@ -18,6 +19,7 @@ export class PatientComponent implements OnInit {
   // Patient data
   patient!: Patient;
   editPatient: Patient = {} as Patient;
+  initials: string = '';
   
   // UI State
   activeTab: string = 'enrollments';
@@ -56,6 +58,7 @@ export class PatientComponent implements OnInit {
       next: (response) => {
         if (response.success && response.object) {
           this.patient = response.object;
+          this.initials = this.getInitials(this.patient.FullName);
           this.editPatient = { ...this.patient };
           this.ns.showAlert({
             notificationType: NotificationType.Success,
@@ -116,7 +119,7 @@ export class PatientComponent implements OnInit {
     if (this.patient) {
       if (!this.editPatient.FullName?.trim()) {
         this.ns.showAlert({
-          notificationType: NotificationType.Warning,
+          notificationType: NotificationType.Success,
           message: 'Patient name is required',
           title: 'Invalid Input'
         });
@@ -138,7 +141,7 @@ export class PatientComponent implements OnInit {
           this.loadPatient(this.patientId);
           this.ns.showAlert({
             notificationType: NotificationType.Success,
-            message: 'Patient updated successfully',
+            message: response.message,
             title: 'Success'
           });
         } else {
@@ -153,7 +156,7 @@ export class PatientComponent implements OnInit {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
           message: error.error.message as string || 'Failed to update patient',
-          title: 'Error'
+          title: error.error.error as string
         });
       }
     });

@@ -29,6 +29,13 @@ export class UserService {
     );
   }
 
+  logoutUser(): Observable<ServiceResponse<null>> {
+    return this.http.post<ServiceResponse<null>>(
+      `${this.API_URL}logout`,
+      { withCredentials: true }
+    );
+  }
+
   getUserById(): Observable<ServiceResponse<User>> {
     return this.http.get<ServiceResponse<User>>(
       `${this.API_URL}getUserById`,

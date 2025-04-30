@@ -15,8 +15,7 @@ export interface LoginUserDto {
 export interface UpdateUserDto {
   FullName?: string;
   Phone?: string;
-  Password?: string;
-  IsWelcomed?: boolean;
+  Email?: string;
 }
 
 //patioent data transfer object

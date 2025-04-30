@@ -98,6 +98,10 @@ export class PatientService implements IPatientService {
             return FormattedResponse.failure('Patient not found.', 'Patient not found');
         }
 
+        if (userExists.UserId !== patientExists.CreatedByUserId) {
+            return FormattedResponse.failure("You are not authorised to perform this action.", "Patient Security")
+        }
+
         let {error} = updatePatientSchema.validate(dto);
 
         if(error) {

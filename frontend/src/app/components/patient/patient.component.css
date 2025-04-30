@@ -58,6 +58,10 @@
     box-shadow: var(--shadow-lg);
 }
 
+.avatar-container span {
+    color: white;
+}
+
 .profile-info {
     flex-grow: 1;
 }

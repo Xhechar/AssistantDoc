@@ -1,3 +1,4 @@
+<app-notification></app-notification>
 <!-- Navbar Component -->
 <nav class="navbar">
     <div class="navbar-container">
@@ -8,74 +9,32 @@
             </a>
         </div>
 
-        <!-- Mobile Menu Toggle Button -->
-        <div class="mobile-toggle" (click)="toggleMobileMenu()">
-            <i class="bx bx-menu" *ngIf="!mobileMenuOpen"></i>
-            <i class="bx bx-x" *ngIf="mobileMenuOpen"></i>
-        </div>
-
         <!-- Navigation Menu -->
         <div class="navbar-menu" [ngClass]="{'active': mobileMenuOpen}">
             <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link">
-                        <i class="bx bx-user-plus"></i> Clients
-                        <i class="bx bx-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a routerLink="/doctor/patients" class="dropdown-item">
-                            <i class="bx bx-user-plus"></i> Register Client
+                <!-- Dropdown Items -->
+                <ng-container *ngFor="let menuItem of menuItems">
+                    <li class="nav-item" [ngClass]="{'dropdown': menuItem.dropdownItems, 'active': isRouteActive(menuItem.route)}" (click)="$event.stopPropagation()">
+                        <a [routerLink]="menuItem.route" class="nav-link" *ngIf="!menuItem.dropdownItems">
+                            <i class="bx {{menuItem.icon}}"></i> {{menuItem.title}}
                         </a>
-                        <a routerLink="/clients/patients" class="dropdown-item">
-                            <i class="bx bx-search"></i> Search Clients
+                        
+                        <a (click)="toggleDropdown(menuItem.id)" class="nav-link dropdown-toggle" *ngIf="menuItem.dropdownItems">
+                            <i class="bx {{menuItem.icon}}"></i> {{menuItem.title}}
+                            <i class="bx bx-chevron-down"></i>
                         </a>
-                        <a routerLink="/doctor/dashboard" class="dropdown-item">
-                            <i class="bx bx-list-ul"></i> Dashboard
-                        </a>
-                    </div>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link">
-                        <i class="bx bx-plus-medical"></i> Programs
-                        <i class="bx bx-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a routerLink="/doctor/programs" class="dropdown-item">
-                            <i class="bx bx-plus-circle"></i> Create Program
-                        </a>
-                        <a routerLink="/doctor/programs" class="dropdown-item">
-                            <i class="bx bx-list-ul"></i> Manage Programs
-                        </a>
-                    </div>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link">
-                        <i class="bx bx-link"></i> Enrollments
-                        <i class="bx bx-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu">
-                        <a routerLink="/doctor/enrollments" class="dropdown-item">
-                            <i class="bx bx-user-check"></i> Enroll Client
-                        </a>
-                        <a routerLink="/doctor/enrollments" class="dropdown-item">
-                            <i class="bx bx-edit"></i> Manage Enrollments
-                        </a>
-                    </div>
-                </li>
-
-                <li class="nav-item">
-                    <a routerLink="/doctor/patients" class="nav-link">
-                        <i class="bx bx-code-alt"></i> API
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a routerLink="/doctor/dashboard" class="nav-link">
-                        <i class="bx bx-home-alt"></i> Dashboard
-                    </a>
-                </li>
+                        
+                        <div class="dropdown-menu" *ngIf="menuItem.dropdownItems" 
+                            [ngClass]="{'show': menuItem.isOpen}">
+                            <a *ngFor="let subItem of menuItem.dropdownItems" 
+                                [routerLink]="subItem.route" 
+                                class="dropdown-item"
+                                (click)="closeAllMenus()">
+                                <i class="bx {{subItem.icon}}"></i> {{subItem.title}}
+                            </a>
+                        </div>
+                    </li>
+                </ng-container>
             </ul>
         </div>
 
@@ -83,15 +42,15 @@
         <div class="navbar-user">
             <div class="notifications">
                 <i class="bx bx-bell"></i>
-                <span class="badge">3</span>
+                <span class="badge" *ngIf="notifications > 0">{{notifications}}</span>
             </div>
 
             <div class="user-profile dropdown">
-                <div class="user-info" (click)="toggleUserMenu()">
-                    <img src="https://ui-avatars.com/api/?name={{user.FullName}}&background=4e6af0&color=fff" alt="User Profile" class="user-avatar">
+                <div class="user-info" (click)="toggleUserMenu($event)">
+                    <img [src]="getUserAvatar()" alt="User Profile" class="user-avatar">
                     <div class="user-details">
-                        <span class="user-name">{{user.FullName}}</span>
-                        <span class="user-role">{{user.Role}}</span>
+                        <span class="user-name">{{displayName}}</span>
+                        <span class="user-role">{{displayRole}}</span>
                     </div>
                     <i class="bx bx-chevron-down"></i>
                 </div>
@@ -100,18 +59,84 @@
                     <a routerLink="/doctor/profile" class="dropdown-item">
                         <i class="bx bx-user-circle"></i> My Profile
                     </a>
-                    <a routerLink="/doctor/dashboard" class="dropdown-item">
+                    <a routerLink="/doctor/settings" class="dropdown-item">
                         <i class="bx bx-cog"></i> Settings
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item logout">
+                    <a (click)="logoutUser()" class="dropdown-item logout">
                         <i class="bx bx-log-out"></i> Logout
                     </a>
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Menu Toggle Button -->
+        <div class="mobile-toggle" (click)="toggleMobileMenu()">
+            <i class="bx" [ngClass]="mobileMenuOpen ? 'bx-x' : 'bx-menu'"></i>
+        </div>
     </div>
 </nav>
+
+<!-- Mobile Navigation Drawer -->
+<div class="mobile-drawer" [ngClass]="{'active': mobileMenuOpen}">
+    <div class="mobile-drawer-header">
+        <div class="user-profile-mobile">
+            <img [src]="getUserAvatar()" alt="User Profile" class="user-avatar">
+            <div class="user-details">
+                <span class="user-name">{{displayName}}</span>
+                <span class="user-role">{{displayRole}}</span>
+            </div>
+        </div>
+    </div>
+    
+    <ul class="mobile-nav">
+        <ng-container *ngFor="let menuItem of menuItems">
+            <li class="mobile-nav-item" [ngClass]="{'active': isRouteActive(menuItem.route)}">
+                <a *ngIf="!menuItem.dropdownItems" [routerLink]="menuItem.route" class="mobile-nav-link" (click)="closeMobileMenu()">
+                    <i class="bx {{menuItem.icon}}"></i>
+                    <span>{{menuItem.title}}</span>
+                </a>
+                
+                <div *ngIf="menuItem.dropdownItems" class="mobile-dropdown">
+                    <a (click)="toggleMobileDropdown(menuItem.id)" class="mobile-nav-link">
+                        <i class="bx {{menuItem.icon}}"></i>
+                        <span>{{menuItem.title}}</span>
+                        <i class="bx" [ngClass]="menuItem.isOpen ? 'bx-chevron-up' : 'bx-chevron-down'"></i>
+                    </a>
+                    
+                    <div class="mobile-dropdown-menu" [ngClass]="{'show': menuItem.isOpen}">
+                        <a *ngFor="let subItem of menuItem.dropdownItems"
+                            [routerLink]="subItem.route"
+                            class="mobile-dropdown-item"
+                            (click)="closeMobileMenu()">
+                            <i class="bx {{subItem.icon}}"></i>
+                            <span>{{subItem.title}}</span>
+                        </a>
+                    </div>
+                </div>
+            </li>
+        </ng-container>
+        
+        <li class="mobile-nav-item mobile-user-actions">
+            <a routerLink="/doctor/profile" class="mobile-nav-link" (click)="closeMobileMenu()">
+                <i class="bx bx-user-circle"></i>
+                <span>My Profile</span>
+            </a>
+        </li>
+        <li class="mobile-nav-item mobile-user-actions">
+            <a routerLink="/doctor/settings" class="mobile-nav-link" (click)="closeMobileMenu()">
+                <i class="bx bx-cog"></i>
+                <span>Settings</span>
+            </a>
+        </li>
+        <li class="mobile-nav-item mobile-user-actions">
+            <a (click)="logoutUser()" class="mobile-nav-link mobile-logout">
+                <i class="bx bx-log-out"></i>
+                <span>Logout</span>
+            </a>
+        </li>
+    </ul>
+</div>
 
 <!-- Overlay for Mobile Menu -->
 <div class="overlay" [ngClass]="{'active': mobileMenuOpen}" (click)="closeMobileMenu()"></div>

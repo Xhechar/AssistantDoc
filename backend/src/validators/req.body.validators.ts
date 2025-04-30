@@ -213,7 +213,7 @@ export const updateUserSchema = Joi.object({
     .messages({
       'string.email': 'Please enter a valid email address.'
     }),
-  Password: Joi.string()
+  Password: Joi.string().allow(null, '')
     .min(6)
     .optional()
     .messages({

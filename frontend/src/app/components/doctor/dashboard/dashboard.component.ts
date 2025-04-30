@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Patient, Program, Enrollment, NotificationType, ServiceResponse } from '../../../interfaces/assist.doc.interfaces';
+import { Patient, Program, Enrollment, NotificationType } from '../../../interfaces/assist.doc.interfaces';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EnrollmentService } from '../../../services/enrollment.service';
@@ -82,8 +82,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.error.message as string || 'Failed to fetch recent patients',
-          title: 'Error'
+          message: error.error.message as string,
+          title: error.error.error as string
         });
       }
     });
@@ -142,8 +142,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       error: (error) => {
         this.ns.showAlert({
           notificationType: NotificationType.Error,
-          message: error.message as string || 'Failed to fetch recent enrollments',
-          title: error.error as string
+          message: error.error.message as string || 'Failed to fetch recent enrollments',
+          title: error.error.error as string
         });
       }
     });

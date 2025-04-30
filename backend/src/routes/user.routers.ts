@@ -13,13 +13,17 @@ userRouter.post('/login', async (req, res) => {
     await userController.loginUser(req, res);
 });
 
+userRouter.post('/logout', async (req, res) => {
+    await userController.logoutUser(req, res);
+});
+
 // Get user by ID
 userRouter.get('/getUserById', verifyToken, verifyAdmin, async (req, res) => {
     await userController.getUserById(req, res);
 });
 
 // Update user
-userRouter.put('/updateUser/:userId', verifyToken, verifyAdmin, async (req, res) => {
+userRouter.put('/updateUser', verifyToken, verifyAdmin, async (req, res) => {
     await userController.updateUser(req, res);
 });
 
